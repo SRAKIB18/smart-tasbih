@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ruhutasbih.app.R
@@ -124,7 +125,12 @@ fun SettingsScreen(
                                     onClick = { viewModel.setThemeMode(mode) },
                                     shape = SegmentedButtonDefaults.itemShape(index = index, count = themeModes.size)
                                 ) {
-                                    Text(themeLabels[index])
+                                    Text(
+                                        text = themeLabels[index],
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontSize = 12.sp
+                                    )
                                 }
                             }
                         }
@@ -149,7 +155,12 @@ fun SettingsScreen(
                                     onClick = { viewModel.setLanguage(lang) },
                                     shape = SegmentedButtonDefaults.itemShape(index = index, count = langModes.size)
                                 ) {
-                                    Text(langLabels[index])
+                                    Text(
+                                        text = langLabels[index],
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontSize = 12.sp
+                                    )
                                 }
                             }
                         }
