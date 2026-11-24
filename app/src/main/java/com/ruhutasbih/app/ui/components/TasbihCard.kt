@@ -37,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,6 +59,7 @@ fun TasbihCard(
     onEdit: () -> Unit,
     onDuplicate: () -> Unit,
     onDelete: () -> Unit,
+    onQuickIncrement: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -239,31 +242,49 @@ fun TasbihCard(
                     )
                 }
 
-                // Previous Pending Badge (if any)
-                if (tasbih.previousPendingRemaining > 0 || tasbih.previousPending > 0) {
-                    val pendingValue = if (tasbih.previousPendingRemaining > 0) tasbih.previousPendingRemaining else tasbih.previousPending
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = PendingBadgeOrange.copy(alpha = 0.15f),
-                        border = BorderStroke(1.dp, PendingBadgeOrange.copy(alpha = 0.5f))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Previous Pending Badge (if any)
+                    if (tasbih.previousPendingRemaining > 0 || tasbih.previousPending > 0) {
+                        val pendingValue = if (tasbih.previousPendingRemaining > 0) tasbih.previousPendingRemaining else tasbih.previousPending
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = PendingBadgeOrange.copy(alpha = 0.15f),
+                            border = BorderStroke(1.dp, PendingBadgeOrange.copy(alpha = 0.5f))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                                    contentDescription = "Pending",
+                                    tint = PendingBadgeOrange,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "${stringResource(R.string.previous_pending)}: $pendingValue",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = PendingBadgeOrange,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    if (onQuickIncrement != null) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        FilledTonalIconButton(
+                            onClick = onQuickIncrement,
+                            modifier = Modifier.size(36.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                                contentDescription = "Pending",
-                                tint = PendingBadgeOrange,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "${stringResource(R.string.previous_pending)}: $pendingValue",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = PendingBadgeOrange,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Quick Increment",
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }

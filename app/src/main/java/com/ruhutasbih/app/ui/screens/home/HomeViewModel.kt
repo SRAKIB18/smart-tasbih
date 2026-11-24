@@ -112,6 +112,12 @@ class HomeViewModel(
         }
     }
 
+    fun quickIncrement(id: String) {
+        viewModelScope.launch {
+            repository.incrementCount(id, 1L)
+        }
+    }
+
     class Factory(private val repository: TasbihRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

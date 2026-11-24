@@ -110,7 +110,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 0.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Dashboard Stat Grid (2x2)
@@ -264,7 +264,8 @@ fun HomeScreen(
                             tasbihToEdit = duplicated
                             showAddDialog = true
                         },
-                        onDelete = { viewModel.deleteTasbih(tasbih.id) }
+                        onDelete = { viewModel.deleteTasbih(tasbih.id) },
+                        onQuickIncrement = { viewModel.quickIncrement(tasbih.id) }
                     )
                 }
             }
