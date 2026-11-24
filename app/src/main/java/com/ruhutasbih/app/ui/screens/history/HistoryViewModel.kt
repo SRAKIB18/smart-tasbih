@@ -120,11 +120,13 @@ class HistoryViewModel(
 
         val todayStr = DateRolloverEngine.getTodayDateString()
 
-        // Extract available years from dataset
+        // Generate available years: Default range (past 5 years to current year + 1) + dataset years
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val defaultYears = (currentYear - 5..currentYear + 1).toSet()
         val datasetYears = allProgress.mapNotNull {
             it.date.take(4).toIntOrNull()
-        }.toSet() + Calendar.getInstance().get(Calendar.YEAR)
-        val sortedYears = datasetYears.sortedDescending()
+        }.toSet()
+        val sortedYears = (defaultYears + datasetYears).sortedDescending()
 
         // Filter items based on active tab and custom selectors
         val tabFiltered = when (sel.tab) {

@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -57,6 +59,7 @@ fun TasbihListScreen(
 
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             TopAppBar(
                 title = {
@@ -93,7 +96,7 @@ fun TasbihListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 0.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Search Bar & Filter Chips
