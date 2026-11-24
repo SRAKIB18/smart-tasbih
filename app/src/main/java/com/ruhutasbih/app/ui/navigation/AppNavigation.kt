@@ -178,24 +178,6 @@ fun AppNavigation(
                 )
 
                 // SAF File Launchers
-                val createCsvLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.CreateDocument("text/csv")
-                ) { uri ->
-                    if (uri != null) {
-                        scope.launch {
-                            try {
-                                val historyList = historyRepository.getAllProgressList()
-                                val csvContent = BackupRestoreHelper.exportToCsv(historyList)
-                                context.contentResolver.openOutputStream(uri)?.use { os ->
-                                    os.write(csvContent.toByteArray())
-                                }
-                                Toast.makeText(context, "Exported CSV to storage!", Toast.LENGTH_SHORT).show()
-                            } catch (e: Exception) {
-                                Toast.makeText(context, "Export failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-                }
 
                 val createJsonLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.CreateDocument("application/json")
@@ -242,9 +224,6 @@ fun AppNavigation(
 
                 SettingsScreen(
                     viewModel = settingsViewModel,
-                    onExportCsv = {
-                        createCsvLauncher.launch("RuhuTasbih_History_$dateStr.csv")
-                    },
                     onBackupJson = {
                         createJsonLauncher.launch("RuhuTasbih_Backup_$dateStr.json")
                     },
