@@ -2,6 +2,7 @@ package com.ruhutasbih.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -22,7 +23,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val preferencesRepository = UserPreferencesRepository(this)
+        val preferencesRepository = UserPreferencesRepository(applicationContext)
 
         setContent {
             val userPrefs by preferencesRepository.userPreferencesFlow.collectAsState(
@@ -40,7 +41,10 @@ class MainActivity : ComponentActivity() {
                 LocaleHelper.setLocale(this@MainActivity, userPrefs.language)
             }
 
-            CompositionLocalProvider(LocalContext provides localeContext) {
+            CompositionLocalProvider(
+                LocalContext provides localeContext,
+                LocalActivityResultRegistryOwner provides this@MainActivity
+            ) {
                 SmartTasbihTheme(darkTheme = isDarkTheme) {
                     AppNavigation()
                 }

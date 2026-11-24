@@ -64,7 +64,7 @@ fun AppNavigation(
         HistoryRepositoryImpl(dailyProgressDao = database.dailyProgressDao())
     }
     val preferencesRepository = remember {
-        UserPreferencesRepository(context)
+        UserPreferencesRepository(context.applicationContext)
     }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()

@@ -1,6 +1,7 @@
 package com.ruhutasbih.app.ui.util
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Build
 import java.util.Locale
@@ -20,7 +21,11 @@ object LocaleHelper {
         resources.updateConfiguration(config, resources.displayMetrics)
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.createConfigurationContext(config)
+            val localizedContext = context.createConfigurationContext(config)
+            object : ContextWrapper(context) {
+                override fun getResources() = localizedContext.resources
+                override fun getAssets() = localizedContext.assets
+            }
         } else {
             context
         }

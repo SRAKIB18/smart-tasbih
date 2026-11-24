@@ -23,32 +23,37 @@ object NotificationHelper {
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Dhikr Reminders"
-            val descriptionText = "Daily reminders for Dhikr and Tasbih count"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-                enableVibration(true)
+            try {
+                val name = "Dhikr Reminders"
+                val descriptionText = "Daily reminders for Dhikr and Tasbih count"
+                val importance = NotificationManager.IMPORTANCE_HIGH
+                val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                    description = descriptionText
+                    enableVibration(true)
+                }
+                val notificationManager = context.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+                notificationManager?.createNotificationChannel(channel)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
         }
     }
 
     fun sendTestNotification(context: Context) {
-        createNotificationChannel(context)
+        val appContext = context.applicationContext
+        createNotificationChannel(appContext)
 
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val intent = Intent(appContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent = PendingIntent.getActivity(
-            context,
+            appContext,
             0,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(appContext, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("📿 Ruhu Tasbih - Daily Dhikr Reminder")
             .setContentText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ | Time for your daily Dhikr & Remembrance!")
@@ -62,8 +67,12 @@ object NotificationHelper {
             .setAutoCancel(true)
             .build()
 
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(1002, notification)
+        try {
+            val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            notificationManager?.notify(1002, notification)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun scheduleMultipleReminders(context: Context, times: Set<String>) {
@@ -74,6 +83,7 @@ object NotificationHelper {
     }
 
     fun scheduleSingleReminder(context: Context, timeStr: String, reqId: Int) {
+        val appContext = context.applicationContext
         val parts = timeStr.split(":")
         val hour = parts.getOrNull(0)?.toIntOrNull() ?: 20
         val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
@@ -95,17 +105,27 @@ object NotificationHelper {
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .build()
 
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "${WORK_NAME}_$reqId",
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-            workRequest
-        )
+        try {
+            WorkManager.getInstance(appContext).enqueueUniquePeriodicWork(
+                "${WORK_NAME}_$reqId",
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                workRequest
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun cancelAllReminders(context: Context) {
-        for (i in 0..10) {
-            WorkManager.getInstance(context).cancelUniqueWork("${WORK_NAME}_$i")
+        val appContext = context.applicationContext
+        try {
+            val workManager = WorkManager.getInstance(appContext)
+            for (i in 0..10) {
+                workManager.cancelUniqueWork("${WORK_NAME}_$i")
+            }
+            workManager.cancelUniqueWork(WORK_NAME)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
     }
 }
