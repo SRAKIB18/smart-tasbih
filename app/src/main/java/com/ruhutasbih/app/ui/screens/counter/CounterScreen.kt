@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.AlertDialog
@@ -49,6 +50,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -64,6 +66,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -81,6 +84,8 @@ import com.ruhutasbih.app.ui.theme.TargetProgressGreen
 import com.ruhutasbih.app.ui.util.AudioReciter
 import com.ruhutasbih.app.ui.util.HapticManager
 import com.ruhutasbih.app.ui.util.SoundManager
+import kotlin.math.cos
+import kotlin.math.sin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,6 +101,7 @@ fun CounterScreen(
     val keepScreenAwake by viewModel.keepScreenAwake.collectAsState()
     val isFullScreen by viewModel.isFullScreen.collectAsState()
     val isLocked by viewModel.isLocked.collectAsState()
+    val userPrefs by viewModel.userPreferences.collectAsState()
 
     val soundManager = remember { SoundManager(context) }
     val hapticManager = remember { HapticManager(context) }
@@ -123,6 +129,7 @@ fun CounterScreen(
     }
 
     var showResetDialog by remember { mutableStateOf(false) }
+    var showSkinDialog by remember { mutableStateOf(false) }
 
     val currentTasbih = tasbih ?: return
 
@@ -138,6 +145,8 @@ fun CounterScreen(
         animationSpec = tween(durationMillis = 300),
         label = "CounterProgress"
     )
+
+    val currentSkin = userPrefs.counterSkin
 
     Scaffold(
         modifier = modifier,
@@ -177,6 +186,13 @@ fun CounterScreen(
                                 imageVector = Icons.Default.LightMode,
                                 contentDescription = "Keep Screen Awake",
                                 tint = if (keepScreenAwake) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        IconButton(onClick = { showSkinDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Palette,
+                                contentDescription = "Select Skin",
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                         IconButton(onClick = {
@@ -239,6 +255,13 @@ fun CounterScreen(
                             imageVector = Icons.Default.LightMode,
                             contentDescription = "Keep Screen Awake",
                             tint = if (keepScreenAwake) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(onClick = { showSkinDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = "Select Skin",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     IconButton(onClick = {
@@ -386,6 +409,34 @@ fun CounterScreen(
                 }
             }
 
+            // Dynamic Tasbih Counter Skin Customization Styling
+            val (trackColor, activeColor, innerSurfaceColor, textColor) = when (currentSkin) {
+                "WOODEN_BEADS" -> Tuple4(
+                    Color(0xFF4A2C11),
+                    Color(0xFFFFB300),
+                    Color(0xFF2C1802),
+                    Color(0xFFFFD54F)
+                )
+                "CRYSTAL_BEADS" -> Tuple4(
+                    Color(0xFF004D40),
+                    Color(0xFF00E5FF),
+                    Color(0xFF00251A),
+                    Color(0xFF1DE9B6)
+                )
+                "METALLIC_RING" -> Tuple4(
+                    Color(0xFF263238),
+                    Color(0xFFFFD700),
+                    Color(0xFF102A43),
+                    Color(0xFFFFE082)
+                )
+                else -> Tuple4( // DIGITAL_LED
+                    MaterialTheme.colorScheme.surfaceVariant,
+                    if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.surface,
+                    if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.onSurface
+                )
+            }
+
             // Central Animated Circular Counter Button
             val interactionSource = remember { MutableInteractionSource() }
             val isPressed by interactionSource.collectIsPressedAsState()
@@ -394,9 +445,6 @@ fun CounterScreen(
                 animationSpec = tween(durationMillis = 100),
                 label = "ButtonScale"
             )
-
-            val trackColor = MaterialTheme.colorScheme.surfaceVariant
-            val activeColor = if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.primary
 
             Box(
                 contentAlignment = Alignment.Center,
@@ -421,10 +469,16 @@ fun CounterScreen(
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val strokeWidth = 18.dp.toPx()
+                    val radius = (size.minDimension - strokeWidth) / 2f
+                    val center = Offset(size.width / 2f, size.height / 2f)
+
+                    // Draw Base Track Ring
                     drawCircle(
                         color = trackColor,
                         style = Stroke(width = strokeWidth)
                     )
+
+                    // Draw Progress Arc
                     drawArc(
                         color = activeColor,
                         startAngle = -90f,
@@ -432,11 +486,30 @@ fun CounterScreen(
                         useCenter = false,
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
+
+                    // Draw 33 Bead Ticks for Physical Bead feel if not digital
+                    if (currentSkin != "DIGITAL_LED") {
+                        val beadCount = 33
+                        for (i in 0 until beadCount) {
+                            val angleRad = Math.toRadians((i * (360.0 / beadCount)) - 90.0)
+                            val bx = center.x + radius * cos(angleRad).toFloat()
+                            val by = center.y + radius * sin(angleRad).toFloat()
+
+                            val isPassedBead = (i.toFloat() / beadCount.toFloat()) <= animatedProgress
+                            val beadColor = if (isPassedBead) activeColor else trackColor.copy(alpha = 0.5f)
+
+                            drawCircle(
+                                color = beadColor,
+                                radius = 4.dp.toPx(),
+                                center = Offset(bx, by)
+                            )
+                        }
+                    }
                 }
 
                 Surface(
                     shape = CircleShape,
-                    color = if (isLocked) MaterialTheme.colorScheme.surface.copy(alpha = 0.85f) else MaterialTheme.colorScheme.surface,
+                    color = if (isLocked) innerSurfaceColor.copy(alpha = 0.85f) else innerSurfaceColor,
                     shadowElevation = 8.dp,
                     modifier = Modifier.size(230.dp)
                 ) {
@@ -453,14 +526,14 @@ fun CounterScreen(
                                 style = MaterialTheme.typography.displayLarge.copy(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 54.sp,
-                                    color = if (isLocked) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurface
+                                    color = if (isLocked) textColor.copy(alpha = 0.5f) else textColor
                                 )
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = if (isLocked) stringResource(R.string.counter_locked) else stringResource(R.string.tap_to_count),
                                 style = MaterialTheme.typography.labelLarge.copy(
-                                    color = if (isLocked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                    color = if (isLocked) MaterialTheme.colorScheme.error else textColor,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
@@ -608,6 +681,61 @@ fun CounterScreen(
         }
     }
 
+    if (showSkinDialog) {
+        AlertDialog(
+            onDismissRequest = { showSkinDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.select_counter_skin),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+            },
+            text = {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    val skins = listOf(
+                        "DIGITAL_LED" to stringResource(R.string.skin_digital_led),
+                        "WOODEN_BEADS" to stringResource(R.string.skin_wooden_beads),
+                        "CRYSTAL_BEADS" to stringResource(R.string.skin_crystal_beads),
+                        "METALLIC_RING" to stringResource(R.string.skin_metallic_ring)
+                    )
+
+                    skins.forEach { (skinKey, label) ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.setCounterSkin(skinKey)
+                                    showSkinDialog = false
+                                }
+                                .padding(vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = currentSkin == skinKey,
+                                onClick = {
+                                    viewModel.setCounterSkin(skinKey)
+                                    showSkinDialog = false
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = if (currentSkin == skinKey) FontWeight.Bold else FontWeight.Normal
+                                )
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showSkinDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -631,6 +759,13 @@ fun CounterScreen(
         )
     }
 }
+
+private data class Tuple4<A, B, C, D>(
+    val first: A,
+    val second: B,
+    val third: C,
+    val fourth: D
+)
 
 @Composable
 private fun StatMetricItem(

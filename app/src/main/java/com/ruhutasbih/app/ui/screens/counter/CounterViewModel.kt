@@ -4,16 +4,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ruhutasbih.app.data.local.entity.TasbihEntity
+import com.ruhutasbih.app.data.preferences.UserPreferences
+import com.ruhutasbih.app.data.preferences.UserPreferencesRepository
 import com.ruhutasbih.app.domain.repository.TasbihRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CounterViewModel(
     private val tasbihId: String,
-    private val repository: TasbihRepository
+    private val repository: TasbihRepository,
+    private val preferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+
+    val userPreferences: StateFlow<UserPreferences> = preferencesRepository.userPreferencesFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = UserPreferences()
+    )
 
     private val _tasbih = MutableStateFlow<TasbihEntity?>(null)
     val tasbih: StateFlow<TasbihEntity?> = _tasbih.asStateFlow()
@@ -79,13 +90,20 @@ class CounterViewModel(
         _isLocked.value = !_isLocked.value
     }
 
+    fun setCounterSkin(skin: String) {
+        viewModelScope.launch {
+            preferencesRepository.setCounterSkin(skin)
+        }
+    }
+
     class Factory(
         private val tasbihId: String,
-        private val repository: TasbihRepository
+        private val repository: TasbihRepository,
+        private val preferencesRepository: UserPreferencesRepository
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return CounterViewModel(tasbihId, repository) as T
+            return CounterViewModel(tasbihId, repository, preferencesRepository) as T
         }
     }
 }

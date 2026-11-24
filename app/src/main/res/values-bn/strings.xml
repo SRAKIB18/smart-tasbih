@@ -73,6 +73,11 @@
     <string name="play_audio">আরবি উচ্চারণ শুনুন</string>
     <string name="stop_audio">অডিও বন্ধ করুন</string>
     <string name="audio_pronunciation">আরবি উচ্চারণ</string>
+    <string name="select_counter_skin">কাউন্টার থিম ও স্কিন কাস্টমাইজেশন</string>
+    <string name="skin_digital_led">ডিজিটাল এলইডি</string>
+    <string name="skin_wooden_beads">ঐতিহ্যবাহী কাষ্ঠ নির্মিত</string>
+    <string name="skin_crystal_beads">ক্রিস্টাল এমারেল্ড</string>
+    <string name="skin_metallic_ring">প্রিমিয়াম মেটালিক রিং</string>
 
     <!-- History -->
     <string name="history_title">কার্যক্রম ও ইতিহাস</string>

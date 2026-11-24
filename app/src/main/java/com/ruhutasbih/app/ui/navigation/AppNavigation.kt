@@ -151,7 +151,7 @@ fun AppNavigation(
             ) { backStackEntry ->
                 val tasbihId = backStackEntry.arguments?.getString("tasbihId") ?: ""
                 val counterViewModel: CounterViewModel = viewModel(
-                    factory = CounterViewModel.Factory(tasbihId, tasbihRepository)
+                    factory = CounterViewModel.Factory(tasbihId, tasbihRepository, preferencesRepository)
                 )
                 CounterScreen(
                     viewModel = counterViewModel,

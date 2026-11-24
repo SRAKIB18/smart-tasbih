@@ -73,6 +73,11 @@
     <string name="play_audio">Listen Arabic Recitation</string>
     <string name="stop_audio">Stop Recitation</string>
     <string name="audio_pronunciation">Arabic Recitation</string>
+    <string name="select_counter_skin">Select Tasbih Skin</string>
+    <string name="skin_digital_led">Digital LED</string>
+    <string name="skin_wooden_beads">Classic Wooden</string>
+    <string name="skin_crystal_beads">Crystal Emerald</string>
+    <string name="skin_metallic_ring">Premium Metallic</string>
 
     <!-- History -->
     <string name="history_title">Activity &amp; History</string>

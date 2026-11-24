@@ -26,7 +26,8 @@ data class UserPreferences(
     val defaultDailyTarget: Long = 100L,
     val dailyReminderEnabled: Boolean = false,
     val dailyReminderTime: String = "20:00",
-    val reminderTimes: Set<String> = setOf("05:30", "18:00", "21:00")
+    val reminderTimes: Set<String> = setOf("05:30", "18:00", "21:00"),
+    val counterSkin: String = "DIGITAL_LED" // "DIGITAL_LED", "WOODEN_BEADS", "CRYSTAL_BEADS", "METALLIC_RING"
 )
 
 class UserPreferencesRepository(context: Context) {
@@ -43,6 +44,7 @@ class UserPreferencesRepository(context: Context) {
         val DAILY_REMINDER_ENABLED = booleanPreferencesKey("daily_reminder_enabled")
         val DAILY_REMINDER_TIME = stringPreferencesKey("daily_reminder_time")
         val REMINDER_TIMES = stringSetPreferencesKey("reminder_times")
+        val COUNTER_SKIN = stringPreferencesKey("counter_skin")
     }
 
     val userPreferencesFlow: Flow<UserPreferences> = appContext.dataStore.data
@@ -63,7 +65,8 @@ class UserPreferencesRepository(context: Context) {
                 defaultDailyTarget = preferences[PreferencesKeys.DEFAULT_DAILY_TARGET] ?: 100L,
                 dailyReminderEnabled = preferences[PreferencesKeys.DAILY_REMINDER_ENABLED] ?: false,
                 dailyReminderTime = preferences[PreferencesKeys.DAILY_REMINDER_TIME] ?: "20:00",
-                reminderTimes = preferences[PreferencesKeys.REMINDER_TIMES] ?: setOf("05:30", "18:00", "21:00")
+                reminderTimes = preferences[PreferencesKeys.REMINDER_TIMES] ?: setOf("05:30", "18:00", "21:00"),
+                counterSkin = preferences[PreferencesKeys.COUNTER_SKIN] ?: "DIGITAL_LED"
             )
         }
 
@@ -126,6 +129,12 @@ class UserPreferencesRepository(context: Context) {
         appContext.dataStore.edit { preferences ->
             val current = preferences[PreferencesKeys.REMINDER_TIMES] ?: setOf("05:30", "18:00", "21:00")
             preferences[PreferencesKeys.REMINDER_TIMES] = current - time
+        }
+    }
+
+    suspend fun setCounterSkin(skin: String) {
+        appContext.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.COUNTER_SKIN] = skin
         }
     }
 }
