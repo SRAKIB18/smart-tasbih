@@ -25,6 +25,10 @@ class HistoryRepositoryImpl(
         return dailyProgressDao.getAllProgressList()
     }
 
+    override suspend fun insertProgressList(list: List<DailyProgressEntity>) {
+        dailyProgressDao.insertAll(list)
+    }
+
     override suspend fun clearAllHistory() {
         dailyProgressDao.clearAll()
     }

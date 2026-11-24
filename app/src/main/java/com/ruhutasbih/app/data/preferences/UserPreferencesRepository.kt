@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,7 +22,8 @@ data class UserPreferences(
     val keepScreenAwake: Boolean = false,
     val defaultDailyTarget: Long = 100L,
     val dailyReminderEnabled: Boolean = false,
-    val dailyReminderTime: String = "20:00"
+    val dailyReminderTime: String = "20:00",
+    val reminderTimes: Set<String> = setOf("05:30", "18:00", "21:00")
 )
 
 class UserPreferencesRepository(private val context: Context) {
@@ -35,6 +37,7 @@ class UserPreferencesRepository(private val context: Context) {
         val DEFAULT_DAILY_TARGET = longPreferencesKey("default_daily_target")
         val DAILY_REMINDER_ENABLED = booleanPreferencesKey("daily_reminder_enabled")
         val DAILY_REMINDER_TIME = stringPreferencesKey("daily_reminder_time")
+        val REMINDER_TIMES = stringSetPreferencesKey("reminder_times")
     }
 
     val userPreferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { preferences ->
@@ -46,7 +49,8 @@ class UserPreferencesRepository(private val context: Context) {
             keepScreenAwake = preferences[PreferencesKeys.KEEP_SCREEN_AWAKE] ?: false,
             defaultDailyTarget = preferences[PreferencesKeys.DEFAULT_DAILY_TARGET] ?: 100L,
             dailyReminderEnabled = preferences[PreferencesKeys.DAILY_REMINDER_ENABLED] ?: false,
-            dailyReminderTime = preferences[PreferencesKeys.DAILY_REMINDER_TIME] ?: "20:00"
+            dailyReminderTime = preferences[PreferencesKeys.DAILY_REMINDER_TIME] ?: "20:00",
+            reminderTimes = preferences[PreferencesKeys.REMINDER_TIMES] ?: setOf("05:30", "18:00", "21:00")
         )
     }
 
@@ -95,6 +99,20 @@ class UserPreferencesRepository(private val context: Context) {
     suspend fun setDailyReminderTime(time: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.DAILY_REMINDER_TIME] = time
+        }
+    }
+
+    suspend fun addReminderTime(time: String) {
+        context.dataStore.edit { preferences ->
+            val current = preferences[PreferencesKeys.REMINDER_TIMES] ?: setOf("05:30", "18:00", "21:00")
+            preferences[PreferencesKeys.REMINDER_TIMES] = current + time
+        }
+    }
+
+    suspend fun removeReminderTime(time: String) {
+        context.dataStore.edit { preferences ->
+            val current = preferences[PreferencesKeys.REMINDER_TIMES] ?: setOf("05:30", "18:00", "21:00")
+            preferences[PreferencesKeys.REMINDER_TIMES] = current - time
         }
     }
 }

@@ -1,9 +1,6 @@
 package com.ruhutasbih.app.ui.screens.settings
 
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,37 +11,45 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CleaningServices
-import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,16 +58,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ruhutasbih.app.R
+import com.ruhutasbih.app.ui.components.DeveloperInfoDialog
+import com.ruhutasbih.app.ui.util.NotificationHelper
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,8 +79,11 @@ fun SettingsScreen(
     onRestoreJson: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val prefs by viewModel.userPreferences.collectAsState()
     var showClearHistoryDialog by remember { mutableStateOf(false) }
+    var showDeveloperModal by remember { mutableStateOf(false) }
+    var showTimePickerModal by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -89,6 +98,15 @@ fun SettingsScreen(
                             fontSize = 22.sp
                         )
                     )
+                },
+                actions = {
+                    IconButton(onClick = { showDeveloperModal = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Developer Profile",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -238,7 +256,7 @@ fun SettingsScreen(
                 }
             }
 
-            // Notifications & Reminders
+            // Powerful Multiple Reminders & Notifications Section
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -246,27 +264,182 @@ fun SettingsScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.sec_notifications),
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(stringResource(R.string.daily_reminder_label))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Notifications",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(R.string.sec_notifications),
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
+
                             Switch(
                                 checked = prefs.dailyReminderEnabled,
-                                onCheckedChange = { viewModel.setDailyReminderEnabled(it) }
+                                onCheckedChange = { enabled ->
+                                    viewModel.setDailyReminderEnabled(enabled)
+                                    if (enabled) {
+                                        NotificationHelper.scheduleMultipleReminders(context, prefs.reminderTimes)
+                                        Toast.makeText(context, "Dhikr Reminders turned ON", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        NotificationHelper.cancelAllReminders(context)
+                                        Toast.makeText(context, "Reminders turned OFF", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             )
+                        }
+
+                        if (prefs.dailyReminderEnabled) {
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Scheduled Reminder Times:",
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                )
+
+                                TextButton(onClick = { showTimePickerModal = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = "Add Time",
+                                        modifier = Modifier.padding(end = 4.dp)
+                                    )
+                                    Text("Add Time")
+                                }
+                            }
+
+                            // Active Reminder Times List
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                prefs.reminderTimes.sorted().forEach { timeStr ->
+                                    Surface(
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 14.dp, vertical = 8.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Schedule,
+                                                    contentDescription = "Time",
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.padding(end = 8.dp)
+                                                )
+                                                Text(
+                                                    text = format12HourTime(timeStr),
+                                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                )
+                                            }
+
+                                            IconButton(
+                                                onClick = {
+                                                    val updatedSet = prefs.reminderTimes - timeStr
+                                                    viewModel.removeReminderTime(timeStr)
+                                                    if (prefs.dailyReminderEnabled) {
+                                                        NotificationHelper.scheduleMultipleReminders(context, updatedSet)
+                                                    }
+                                                    Toast.makeText(context, "Removed ${format12HourTime(timeStr)}", Toast.LENGTH_SHORT).show()
+                                                }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Delete",
+                                                    tint = MaterialTheme.colorScheme.error
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // Quick Time Presets (Fajr, Maghrib, Night)
+                            Text(
+                                text = "Add Quick Presets:",
+                                style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            LazyRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                item {
+                                    AssistChip(
+                                        onClick = {
+                                            viewModel.addReminderTime("05:30")
+                                            val updatedSet = prefs.reminderTimes + "05:30"
+                                            NotificationHelper.scheduleMultipleReminders(context, updatedSet)
+                                            Toast.makeText(context, "Added Fajr (05:30 AM)", Toast.LENGTH_SHORT).show()
+                                        },
+                                        label = { Text("+ Fajr (05:30 AM)") }
+                                    )
+                                }
+                                item {
+                                    AssistChip(
+                                        onClick = {
+                                            viewModel.addReminderTime("18:00")
+                                            val updatedSet = prefs.reminderTimes + "18:00"
+                                            NotificationHelper.scheduleMultipleReminders(context, updatedSet)
+                                            Toast.makeText(context, "Added Maghrib (06:00 PM)", Toast.LENGTH_SHORT).show()
+                                        },
+                                        label = { Text("+ Maghrib (06:00 PM)") }
+                                    )
+                                }
+                                item {
+                                    AssistChip(
+                                        onClick = {
+                                            viewModel.addReminderTime("21:00")
+                                            val updatedSet = prefs.reminderTimes + "21:00"
+                                            NotificationHelper.scheduleMultipleReminders(context, updatedSet)
+                                            Toast.makeText(context, "Added Night (09:00 PM)", Toast.LENGTH_SHORT).show()
+                                        },
+                                        label = { Text("+ Night (09:00 PM)") }
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Test Notification Button
+                        OutlinedButton(
+                            onClick = {
+                                NotificationHelper.sendTestNotification(context)
+                                Toast.makeText(context, "Test Dhikr Notification Sent!", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.NotificationsActive,
+                                contentDescription = "Test Notification",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Send Test Notification")
                         }
                     }
                 }
@@ -332,88 +505,6 @@ fun SettingsScreen(
                 }
             }
 
-            // Developer Profile Card
-            item {
-                val context = LocalContext.current
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.Code, contentDescription = "Developer")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.sec_developer),
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.developer_photo),
-                                contentDescription = "Rakibul Islam",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(68.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                            )
-
-                            Spacer(modifier = Modifier.width(14.dp))
-
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.dev_name),
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp
-                                    )
-                                )
-                                Text(
-                                    text = stringResource(R.string.dev_role),
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Action Buttons: GitHub & WhatsApp / Phone
-                        OutlinedButton(
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SRAKIB17"))
-                                context.startActivity(intent)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(stringResource(R.string.dev_github))
-                        }
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        OutlinedButton(
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/8801873989651"))
-                                context.startActivity(intent)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(stringResource(R.string.dev_phone))
-                        }
-                    }
-                }
-            }
-
             // About Section
             item {
                 Card(
@@ -448,6 +539,52 @@ fun SettingsScreen(
         }
     }
 
+    if (showTimePickerModal) {
+        val timePickerState = rememberTimePickerState(
+            initialHour = 20,
+            initialMinute = 0,
+            is24Hour = false
+        )
+
+        AlertDialog(
+            onDismissRequest = { showTimePickerModal = false },
+            title = { Text("Add Reminder Time") },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    TimePicker(state = timePickerState)
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val formattedTime = String.format(Locale.US, "%02d:%02d", timePickerState.hour, timePickerState.minute)
+                        viewModel.addReminderTime(formattedTime)
+                        val updatedSet = prefs.reminderTimes + formattedTime
+                        if (prefs.dailyReminderEnabled) {
+                            NotificationHelper.scheduleMultipleReminders(context, updatedSet)
+                        }
+                        showTimePickerModal = false
+                        Toast.makeText(context, "Added reminder for ${format12HourTime(formattedTime)}", Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    Text(stringResource(R.string.action_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePickerModal = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    if (showDeveloperModal) {
+        DeveloperInfoDialog(onDismiss = { showDeveloperModal = false })
+    }
+
     if (showClearHistoryDialog) {
         AlertDialog(
             onDismissRequest = { showClearHistoryDialog = false },
@@ -469,5 +606,16 @@ fun SettingsScreen(
                 }
             }
         )
+    }
+}
+
+private fun format12HourTime(time24: String): String {
+    return try {
+        val sdf24 = SimpleDateFormat("HH:mm", Locale.US)
+        val sdf12 = SimpleDateFormat("hh:mm a", Locale.US)
+        val date = sdf24.parse(time24)
+        date?.let { sdf12.format(it) } ?: time24
+    } catch (e: Exception) {
+        time24
     }
 }

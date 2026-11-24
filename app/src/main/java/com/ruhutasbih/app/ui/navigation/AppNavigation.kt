@@ -1,6 +1,8 @@
 package com.ruhutasbih.app.ui.navigation
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -38,6 +40,9 @@ import com.ruhutasbih.app.ui.screens.settings.SettingsViewModel
 import com.ruhutasbih.app.ui.screens.tasbih.TasbihListScreen
 import com.ruhutasbih.app.ui.util.BackupRestoreHelper
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun AppNavigation(
@@ -171,25 +176,80 @@ fun AppNavigation(
                         historyRepository = historyRepository
                     )
                 )
+
+                // SAF File Launchers
+                val createCsvLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.CreateDocument("text/csv")
+                ) { uri ->
+                    if (uri != null) {
+                        scope.launch {
+                            try {
+                                val historyList = historyRepository.getAllProgressList()
+                                val csvContent = BackupRestoreHelper.exportToCsv(historyList)
+                                context.contentResolver.openOutputStream(uri)?.use { os ->
+                                    os.write(csvContent.toByteArray())
+                                }
+                                Toast.makeText(context, "Exported CSV to storage!", Toast.LENGTH_SHORT).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Export failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+
+                val createJsonLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.CreateDocument("application/json")
+                ) { uri ->
+                    if (uri != null) {
+                        scope.launch {
+                            try {
+                                val tasbihs = database.tasbihDao().getAllTasbihsList()
+                                val historyList = historyRepository.getAllProgressList()
+                                val jsonContent = BackupRestoreHelper.exportToJson(tasbihs, historyList)
+                                context.contentResolver.openOutputStream(uri)?.use { os ->
+                                    os.write(jsonContent.toByteArray())
+                                }
+                                Toast.makeText(context, "Saved Backup JSON to storage!", Toast.LENGTH_SHORT).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Backup failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+
+                val openJsonLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.OpenDocument()
+                ) { uri ->
+                    if (uri != null) {
+                        scope.launch {
+                            try {
+                                val jsonContent = context.contentResolver.openInputStream(uri)?.use { isStream ->
+                                    isStream.bufferedReader().readText()
+                                } ?: ""
+                                if (jsonContent.isNotBlank()) {
+                                    settingsViewModel.restoreBackup(jsonContent) { success, msg ->
+                                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Restore failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+
+                val dateStr = SimpleDateFormat("yyyyMMdd_HHmm", Locale.US).format(Date())
+
                 SettingsScreen(
                     viewModel = settingsViewModel,
                     onExportCsv = {
-                        scope.launch {
-                            val historyList = historyRepository.getAllProgressList()
-                            val csvContent = BackupRestoreHelper.exportToCsv(historyList)
-                            Toast.makeText(context, "CSV exported (${csvContent.length} bytes)", Toast.LENGTH_SHORT).show()
-                        }
+                        createCsvLauncher.launch("RuhuTasbih_History_$dateStr.csv")
                     },
                     onBackupJson = {
-                        scope.launch {
-                            val tasbihs = database.tasbihDao().getAllTasbihsList()
-                            val historyList = historyRepository.getAllProgressList()
-                            val jsonContent = BackupRestoreHelper.exportToJson(tasbihs, historyList)
-                            Toast.makeText(context, "Backup JSON generated (${jsonContent.length} chars)", Toast.LENGTH_SHORT).show()
-                        }
+                        createJsonLauncher.launch("RuhuTasbih_Backup_$dateStr.json")
                     },
                     onRestoreJson = {
-                        Toast.makeText(context, "Ready to restore backup JSON", Toast.LENGTH_SHORT).show()
+                        openJsonLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
                     }
                 )
             }

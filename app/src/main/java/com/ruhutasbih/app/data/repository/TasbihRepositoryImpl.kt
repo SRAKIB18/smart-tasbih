@@ -54,6 +54,10 @@ class TasbihRepositoryImpl(
         syncDailyProgress(updated, todayStr)
     }
 
+    override suspend fun insertTasbihs(tasbihs: List<TasbihEntity>) {
+        tasbihDao.insertAll(tasbihs)
+    }
+
     override suspend fun updateTasbih(tasbih: TasbihEntity) {
         val todayStr = DateRolloverEngine.getTodayDateString()
         val calculated = SmartCountingEngine.calculate(
@@ -183,6 +187,10 @@ class TasbihRepositoryImpl(
                 syncDailyProgress(rolledOver, todayStr)
             }
         }
+    }
+
+    override suspend fun clearAllTasbihs() {
+        tasbihDao.clearAll()
     }
 
     private suspend fun syncDailyProgress(tasbih: TasbihEntity, dateStr: String) {

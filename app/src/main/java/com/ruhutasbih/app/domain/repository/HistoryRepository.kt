@@ -8,5 +8,6 @@ interface HistoryRepository {
     fun getHistoryForTasbih(tasbihId: String): Flow<List<DailyProgressEntity>>
     fun getAllProgressFlow(): Flow<List<DailyProgressEntity>>
     suspend fun getAllProgressList(): List<DailyProgressEntity>
+    suspend fun insertProgressList(list: List<DailyProgressEntity>)
     suspend fun clearAllHistory()
 }

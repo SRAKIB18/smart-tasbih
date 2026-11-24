@@ -7,6 +7,7 @@ import com.ruhutasbih.app.data.preferences.UserPreferences
 import com.ruhutasbih.app.data.preferences.UserPreferencesRepository
 import com.ruhutasbih.app.domain.repository.HistoryRepository
 import com.ruhutasbih.app.domain.repository.TasbihRepository
+import com.ruhutasbih.app.ui.util.BackupRestoreHelper
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -66,9 +67,57 @@ class SettingsViewModel(
         }
     }
 
+    fun setDailyReminderTime(time: String) {
+        viewModelScope.launch {
+            preferencesRepository.setDailyReminderTime(time)
+        }
+    }
+
+    fun addReminderTime(time: String) {
+        viewModelScope.launch {
+            preferencesRepository.addReminderTime(time)
+        }
+    }
+
+    fun removeReminderTime(time: String) {
+        viewModelScope.launch {
+            preferencesRepository.removeReminderTime(time)
+        }
+    }
+
+    fun restoreBackup(jsonString: String, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            val backupData = BackupRestoreHelper.importFromJson(jsonString)
+            if (backupData == null) {
+                onResult(false, "Invalid or corrupted backup JSON file")
+                return@launch
+            }
+
+            try {
+                if (backupData.tasbihs.isNotEmpty()) {
+                    tasbihRepository.insertTasbihs(backupData.tasbihs)
+                }
+                if (backupData.history.isNotEmpty()) {
+                    historyRepository.insertProgressList(backupData.history)
+                }
+                onResult(true, "Successfully restored ${backupData.tasbihs.size} Tasbihs & ${backupData.history.size} History records!")
+            } catch (e: Exception) {
+                onResult(false, "Restore failed: ${e.localizedMessage}")
+            }
+        }
+    }
+
     fun clearAllHistory() {
         viewModelScope.launch {
             historyRepository.clearAllHistory()
+        }
+    }
+
+    fun resetAllAppData(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            historyRepository.clearAllHistory()
+            tasbihRepository.clearAllTasbihs()
+            onComplete()
         }
     }
 
