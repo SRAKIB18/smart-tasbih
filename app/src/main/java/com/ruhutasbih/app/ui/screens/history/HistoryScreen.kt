@@ -2,6 +2,8 @@ package com.ruhutasbih.app.ui.screens.history
 
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Card
@@ -62,8 +65,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -323,7 +328,7 @@ fun HistoryScreen(
                     }
                 }
 
-                // Professional Bar Chart Card
+                // Professional Interactive Bar Chart Card
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -335,19 +340,31 @@ fun HistoryScreen(
                     ) {
                         Column(modifier = Modifier.padding(20.dp)) {
                             Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.DateRange,
-                                    contentDescription = "Chart",
-                                    tint = ArabicGoldText
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = "Chart",
+                                        tint = ArabicGoldText
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Reading Activity Chart",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp
+                                        )
+                                    )
+                                }
+
                                 Text(
-                                    text = "Reading Activity Chart",
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp
+                                    text = "Tap bar to inspect",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontSize = 11.sp
                                     )
                                 )
                             }
@@ -358,7 +375,7 @@ fun HistoryScreen(
                                 data = uiState.chartData,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp)
+                                    .height(220.dp)
                             )
                         }
                     }
@@ -502,7 +519,9 @@ private fun ProfessionalBarChart(
     val gridColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
     val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
 
-    val dynamicFontSize = if (data.size > 8) 20f else 26f
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    val dynamicFontSize = if (data.size > 8) 18f else 24f
 
     val textPaint = remember(textColor, dynamicFontSize) {
         Paint().apply {
@@ -523,97 +542,178 @@ private fun ProfessionalBarChart(
         }
     }
 
-    Canvas(modifier = modifier) {
-        if (data.isEmpty()) return@Canvas
+    Column(modifier = modifier) {
+        // Prominent High-Visibility Inspect Tooltip Badge
+        if (selectedIndex != null && selectedIndex!! in data.indices) {
+            val selectedItem = data[selectedIndex!!]
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shadowElevation = 4.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Selected",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.height(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${selectedItem.first}: ${selectedItem.second} counts",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        )
+                    }
 
-        val maxVal = maxOf(1L, data.maxOf { it.second })
-        val count = data.size
-        val availableWidth = size.width
-        val topPadding = 50.dp.toPx()
-        val bottomPadding = 40.dp.toPx()
-        val usableHeight = size.height - topPadding - bottomPadding
-
-        val barSpacing = availableWidth / (count * 2f + 1f)
-        val barWidth = barSpacing
-
-        // Draw horizontal grid lines
-        val lineCount = 3
-        val dashPathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-        for (i in 0..lineCount) {
-            val y = topPadding + (usableHeight / lineCount) * i
-            drawLine(
-                color = gridColor,
-                start = Offset(0f, y),
-                end = Offset(availableWidth, y),
-                strokeWidth = 1.dp.toPx(),
-                pathEffect = dashPathEffect
-            )
+                    Text(
+                        text = "✕",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.clickable { selectedIndex = null }
+                    )
+                }
+            }
         }
 
-        val peakVal = data.maxOf { it.second }
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(data) {
+                    detectTapGestures { offset ->
+                        if (data.isEmpty()) return@detectTapGestures
+                        val availableWidth = size.width
+                        val count = data.size
+                        val barSpacing = availableWidth / (count * 2f + 1f)
+                        val barWidth = barSpacing
 
-        data.forEachIndexed { index, pair ->
-            val dateLabel = pair.first
-            val valNum = pair.second
+                        data.forEachIndexed { idx, _ ->
+                            val xStart = barSpacing + idx * (barWidth + barSpacing)
+                            val xEnd = xStart + barWidth
+                            if (offset.x in (xStart - barSpacing / 2f)..(xEnd + barSpacing / 2f)) {
+                                selectedIndex = if (selectedIndex == idx) null else idx
+                            }
+                        }
+                    }
+                }
+        ) {
+            if (data.isEmpty()) return@Canvas
 
-            val heightRatio = (valNum.toFloat() / maxVal.toFloat()).coerceIn(0f, 1f)
-            val barHeight = usableHeight * heightRatio
+            val maxVal = maxOf(1L, data.maxOf { it.second })
+            val count = data.size
+            val availableWidth = size.width
+            val topPadding = 40.dp.toPx()
+            val bottomPadding = 36.dp.toPx()
+            val usableHeight = size.height - topPadding - bottomPadding
 
-            val x = barSpacing + index * (barWidth + barSpacing)
-            val yTop = topPadding + (usableHeight - barHeight)
-            val yBottom = topPadding + usableHeight
+            val barSpacing = availableWidth / (count * 2f + 1f)
+            val barWidth = barSpacing
 
-            val isPeak = valNum > 0 && valNum == peakVal
+            // Draw horizontal grid lines
+            val lineCount = 3
+            val dashPathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+            for (i in 0..lineCount) {
+                val y = topPadding + (usableHeight / lineCount) * i
+                drawLine(
+                    color = gridColor,
+                    start = Offset(0f, y),
+                    end = Offset(availableWidth, y),
+                    strokeWidth = 1.dp.toPx(),
+                    pathEffect = dashPathEffect
+                )
+            }
 
-            // Draw Background Bar Track
-            drawRoundRect(
-                color = trackColor.copy(alpha = 0.6f),
-                topLeft = Offset(x, topPadding),
-                size = Size(barWidth, usableHeight),
-                cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx())
-            )
+            val peakVal = data.maxOf { it.second }
 
-            // Draw Active Bar with Gradient
-            if (barHeight > 0) {
-                val barGradient = if (isPeak) {
-                    Brush.verticalGradient(
-                        colors = listOf(goldColor, primaryColor),
-                        startY = yTop,
-                        endY = yBottom
+            data.forEachIndexed { index, pair ->
+                val fullLabel = pair.first
+                val shortLabel = if (fullLabel.length > 5) fullLabel.take(5) else fullLabel
+                val valNum = pair.second
+
+                val heightRatio = (valNum.toFloat() / maxVal.toFloat()).coerceIn(0f, 1f)
+                val barHeight = usableHeight * heightRatio
+
+                val x = barSpacing + index * (barWidth + barSpacing)
+                val yTop = topPadding + (usableHeight - barHeight)
+                val yBottom = topPadding + usableHeight
+
+                val isPeak = valNum > 0 && valNum == peakVal
+                val isSelected = selectedIndex == index
+
+                // Draw Background Bar Track
+                drawRoundRect(
+                    color = trackColor.copy(alpha = 0.6f),
+                    topLeft = Offset(x, topPadding),
+                    size = Size(barWidth, usableHeight),
+                    cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx())
+                )
+
+                // Draw Active Bar with Gradient
+                if (barHeight > 0) {
+                    val barGradient = if (isPeak) {
+                        Brush.verticalGradient(
+                            colors = listOf(goldColor, primaryColor),
+                            startY = yTop,
+                            endY = yBottom
+                        )
+                    } else {
+                        Brush.verticalGradient(
+                            colors = listOf(primaryColor, primaryColor.copy(alpha = 0.6f)),
+                            startY = yTop,
+                            endY = yBottom
+                        )
+                    }
+
+                    drawRoundRect(
+                        brush = barGradient,
+                        topLeft = Offset(x, yTop),
+                        size = Size(barWidth, barHeight),
+                        cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx())
                     )
-                } else {
-                    Brush.verticalGradient(
-                        colors = listOf(primaryColor, primaryColor.copy(alpha = 0.6f)),
-                        startY = yTop,
-                        endY = yBottom
+
+                    // Draw Selected Ring Outline
+                    if (isSelected) {
+                        drawRoundRect(
+                            color = goldColor,
+                            topLeft = Offset(x - 2.dp.toPx(), yTop - 2.dp.toPx()),
+                            size = Size(barWidth + 4.dp.toPx(), barHeight + 4.dp.toPx()),
+                            cornerRadius = CornerRadius(14.dp.toPx(), 14.dp.toPx()),
+                            style = Stroke(width = 3.dp.toPx())
+                        )
+                    }
+                }
+
+                // Draw Value Badge on top of bar
+                if (valNum > 0) {
+                    drawContext.canvas.nativeCanvas.drawText(
+                        valNum.toString(),
+                        x + barWidth / 2f,
+                        yTop - 10.dp.toPx(),
+                        if (isPeak || isSelected) goldPaint else textPaint
                     )
                 }
 
-                drawRoundRect(
-                    brush = barGradient,
-                    topLeft = Offset(x, yTop),
-                    size = Size(barWidth, barHeight),
-                    cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx())
-                )
-            }
-
-            // Draw Value Badge on top of bar
-            if (valNum > 0) {
+                // Draw Bottom Axis Label
                 drawContext.canvas.nativeCanvas.drawText(
-                    valNum.toString(),
+                    shortLabel,
                     x + barWidth / 2f,
-                    yTop - 12.dp.toPx(),
-                    if (isPeak) goldPaint else textPaint
+                    size.height - 6.dp.toPx(),
+                    if (isSelected) goldPaint else textPaint
                 )
             }
-
-            // Draw Bottom Date Label
-            drawContext.canvas.nativeCanvas.drawText(
-                dateLabel,
-                x + barWidth / 2f,
-                size.height - 8.dp.toPx(),
-                textPaint
-            )
         }
     }
 }

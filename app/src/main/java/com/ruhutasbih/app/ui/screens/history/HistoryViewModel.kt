@@ -162,10 +162,10 @@ class HistoryViewModel(
             completedCount.toFloat() / tabFiltered.size.toFloat()
         } else 0f
 
-        // Generate precise chart data for each tab selection
+        // Generate precise chart data with FULL Tasbih names
         val chartData = when (sel.tab) {
             0 -> {
-                tabFiltered.map { it.tasbihName.take(5) to it.todayReading }
+                tabFiltered.map { it.tasbihName to it.todayReading }
             }
             1 -> {
                 val past7Dates = getPastDatesFrom(sel.dailyDate, 7).reversed()
