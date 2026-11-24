@@ -106,9 +106,16 @@
     <string name="clear_history">Clear History Logs</string>
     <string name="reset_app_data">Reset Application</string>
 
+    <!-- Developer Section -->
+    <string name="sec_developer">Developer Profile</string>
+    <string name="dev_name">Rakibul Islam</string>
+    <string name="dev_role">Lead Android App Developer</string>
+    <string name="dev_github">GitHub: SRAKIB17</string>
+    <string name="dev_phone">WhatsApp / Call: +8801873989651</string>
+
     <string name="sec_about">About Ruhu Tasbih</string>
     <string name="version_label">Version 1.0.0 (Offline First)</string>
-    <string name="developer_info">Built with Love &amp; Devotion</string>
+    <string name="developer_info">Built with Love &amp; Devotion by Rakibul Islam</string>
     <string name="privacy_policy">Privacy First: 100% Local Storage, No Cloud Sync or Data Collection.</string>
 
     <string name="confirm_clear_history_title">Clear All History?</string>

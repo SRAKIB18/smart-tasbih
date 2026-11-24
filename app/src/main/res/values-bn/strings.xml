@@ -106,9 +106,16 @@
     <string name="clear_history">ইতিহাস ক্লিয়ার করুন</string>
     <string name="reset_app_data">অ্যাপ্লিকেশন রিসেট করুন</string>
 
+    <!-- Developer Section -->
+    <string name="sec_developer">ডেভেলপার পরিচিতি</string>
+    <string name="dev_name">রাকিবুল ইসলাম</string>
+    <string name="dev_role">লিড অ্যান্ডয়েড অ্যাপ ডেভেলপার</string>
+    <string name="dev_github">গিটহাব: SRAKIB17</string>
+    <string name="dev_phone">হোয়াটসঅ্যাপ / ফোন: +8801873989651</string>
+
     <string name="sec_about">রুহু তাসবিহ সম্পর্কে</string>
     <string name="version_label">ভার্সন ১.০.০ (অফলাইন ফার্স্ট)</string>
-    <string name="developer_info">আন্তরিক ভালোবাসায় নির্মিত</string>
+    <string name="developer_info">আন্তরিক ভালোবাসায় নির্মিত - রাকিবুল ইসলাম</string>
     <string name="privacy_policy">গোপনীয়তা নীতি: ১০০% লোকাল স্টোরেজ, কোনো ক্লাউড সিঙ্ক বা ডাটা সংগ্রহ করা হয় না।</string>
 
     <string name="confirm_clear_history_title">সকল ইতিহাস মুছে ফেলবেন?</string>
