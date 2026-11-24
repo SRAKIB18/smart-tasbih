@@ -13,16 +13,16 @@ object LocaleHelper {
         }
         Locale.setDefault(locale)
 
-        val config = Configuration(context.resources.configuration)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            config.setLocale(locale)
-            return context.createConfigurationContext(config)
+        val resources = context.resources
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+        @Suppress("DEPRECATION")
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.createConfigurationContext(config)
         } else {
-            @Suppress("DEPRECATION")
-            config.locale = locale
-            @Suppress("DEPRECATION")
-            context.resources.updateConfiguration(config, context.resources.displayMetrics)
-            return context
+            context
         }
     }
 }
