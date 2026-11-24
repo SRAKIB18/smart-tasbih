@@ -23,8 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
@@ -64,7 +66,9 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -93,6 +97,7 @@ fun HistoryScreen(
 
     var showMonthDropdown by remember { mutableStateOf(false) }
     var showYearDropdown by remember { mutableStateOf(false) }
+    var isCurveChartStyle by remember { mutableStateOf(true) }
 
     val monthNames = listOf(
         "January", "February", "March", "April", "May", "June",
@@ -328,7 +333,7 @@ fun HistoryScreen(
                     }
                 }
 
-                // Professional Interactive Bar Chart Card
+                // Professional Interactive Chart Card
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -360,23 +365,34 @@ fun HistoryScreen(
                                     )
                                 }
 
-                                Text(
-                                    text = "Tap bar to inspect",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontSize = 11.sp
-                                    )
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    IconButton(onClick = { isCurveChartStyle = !isCurveChartStyle }) {
+                                        Icon(
+                                            imageVector = if (isCurveChartStyle) Icons.Default.BarChart else Icons.AutoMirrored.Filled.ShowChart,
+                                            contentDescription = "Toggle Chart Style",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
-                            ProfessionalBarChart(
-                                data = uiState.chartData,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(220.dp)
-                            )
+                            if (isCurveChartStyle) {
+                                ProfessionalCurveAreaChart(
+                                    data = uiState.chartData,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(220.dp)
+                                )
+                            } else {
+                                ProfessionalBarChart(
+                                    data = uiState.chartData,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(220.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -504,6 +520,230 @@ fun HistoryScreen(
             }
         ) {
             DatePicker(state = datePickerState)
+        }
+    }
+}
+
+@Composable
+private fun ProfessionalCurveAreaChart(
+    data: List<Pair<String, Long>>,
+    modifier: Modifier = Modifier
+) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val goldColor = ArabicGoldText
+    val gridColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
+    val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
+
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    val dynamicFontSize = if (data.size > 8) 18f else 24f
+
+    val textPaint = remember(textColor, dynamicFontSize) {
+        Paint().apply {
+            color = textColor
+            textSize = dynamicFontSize
+            isAntiAlias = true
+            textAlign = Paint.Align.CENTER
+        }
+    }
+
+    val goldPaint = remember(goldColor, dynamicFontSize) {
+        Paint().apply {
+            color = goldColor.toArgb()
+            textSize = dynamicFontSize
+            isAntiAlias = true
+            textAlign = Paint.Align.CENTER
+            isFakeBoldText = true
+        }
+    }
+
+    Column(modifier = modifier) {
+        // Prominent High-Visibility Inspect Tooltip Badge
+        if (selectedIndex != null && selectedIndex!! in data.indices) {
+            val selectedItem = data[selectedIndex!!]
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shadowElevation = 4.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Selected",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.height(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${selectedItem.first}: ${selectedItem.second} counts",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        )
+                    }
+
+                    Text(
+                        text = "✕",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.clickable { selectedIndex = null }
+                    )
+                }
+            }
+        }
+
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(data) {
+                    detectTapGestures { offset ->
+                        if (data.isEmpty()) return@detectTapGestures
+                        val count = data.size
+                        val availableWidth = size.width
+                        val stepX = availableWidth / (count - 1f).coerceAtLeast(1f)
+
+                        data.forEachIndexed { idx, _ ->
+                            val x = if (count == 1) availableWidth / 2f else idx * stepX
+                            if (offset.x in (x - stepX / 2f)..(x + stepX / 2f)) {
+                                selectedIndex = if (selectedIndex == idx) null else idx
+                            }
+                        }
+                    }
+                }
+        ) {
+            if (data.isEmpty()) return@Canvas
+
+            val maxVal = maxOf(1L, data.maxOf { it.second })
+            val count = data.size
+            val availableWidth = size.width
+            val topPadding = 45.dp.toPx()
+            val bottomPadding = 36.dp.toPx()
+            val usableHeight = size.height - topPadding - bottomPadding
+
+            // Horizontal reference grid lines
+            val lineCount = 3
+            val dashPathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+            for (i in 0..lineCount) {
+                val y = topPadding + (usableHeight / lineCount) * i
+                drawLine(
+                    color = gridColor,
+                    start = Offset(0f, y),
+                    end = Offset(availableWidth, y),
+                    strokeWidth = 1.dp.toPx(),
+                    pathEffect = dashPathEffect
+                )
+            }
+
+            val points = data.mapIndexed { idx, pair ->
+                val x = if (count == 1) availableWidth / 2f else (availableWidth / (count - 1f)) * idx
+                val heightRatio = (pair.second.toFloat() / maxVal.toFloat()).coerceIn(0f, 1f)
+                val y = topPadding + (usableHeight * (1f - heightRatio))
+                Offset(x, y)
+            }
+
+            // Build smooth Bezier Curve Path
+            val strokePath = Path().apply {
+                if (points.isNotEmpty()) {
+                    moveTo(points[0].x, points[0].y)
+                    for (i in 0 until points.size - 1) {
+                        val p1 = points[i]
+                        val p2 = points[i + 1]
+                        val controlX1 = p1.x + (p2.x - p1.x) / 2f
+                        val controlY1 = p1.y
+                        val controlX2 = p1.x + (p2.x - p1.x) / 2f
+                        val controlY2 = p2.y
+                        cubicTo(controlX1, controlY1, controlX2, controlY2, p2.x, p2.y)
+                    }
+                }
+            }
+
+            // Build Fill Path under curve
+            val fillPath = Path().apply {
+                addPath(strokePath)
+                if (points.isNotEmpty()) {
+                    lineTo(points.last().x, topPadding + usableHeight)
+                    lineTo(points.first().x, topPadding + usableHeight)
+                    close()
+                }
+            }
+
+            // Draw glowing gradient fill under curve
+            val areaGradient = Brush.verticalGradient(
+                colors = listOf(goldColor.copy(alpha = 0.45f), primaryColor.copy(alpha = 0.05f)),
+                startY = topPadding,
+                endY = topPadding + usableHeight
+            )
+            drawPath(path = fillPath, brush = areaGradient)
+
+            // Draw smooth glowing curve stroke
+            drawPath(
+                path = strokePath,
+                brush = Brush.horizontalGradient(listOf(primaryColor, goldColor, primaryColor)),
+                style = Stroke(width = 3.5.dp.toPx(), cap = StrokeCap.Round)
+            )
+
+            val peakVal = data.maxOf { it.second }
+
+            // Draw interactive touch nodes and labels
+            points.forEachIndexed { index, point ->
+                val pair = data[index]
+                val fullLabel = pair.first
+                val shortLabel = if (fullLabel.length > 5) fullLabel.take(5) else fullLabel
+                val valNum = pair.second
+
+                val isPeak = valNum > 0 && valNum == peakVal
+                val isSelected = selectedIndex == index
+
+                // Outer aura ring for peak/selected nodes
+                if (isPeak || isSelected) {
+                    drawCircle(
+                        color = goldColor.copy(alpha = 0.35f),
+                        radius = 12.dp.toPx(),
+                        center = point
+                    )
+                    drawCircle(
+                        color = goldColor,
+                        radius = 6.dp.toPx(),
+                        center = point
+                    )
+                } else {
+                    drawCircle(
+                        color = primaryColor,
+                        radius = 4.dp.toPx(),
+                        center = point
+                    )
+                }
+
+                // Value label on top
+                if (valNum > 0) {
+                    drawContext.canvas.nativeCanvas.drawText(
+                        valNum.toString(),
+                        point.x,
+                        point.y - 12.dp.toPx(),
+                        if (isPeak || isSelected) goldPaint else textPaint
+                    )
+                }
+
+                // Date/Tasbih label on bottom
+                drawContext.canvas.nativeCanvas.drawText(
+                    shortLabel,
+                    point.x,
+                    size.height - 6.dp.toPx(),
+                    if (isSelected) goldPaint else textPaint
+                )
+            }
         }
     }
 }
