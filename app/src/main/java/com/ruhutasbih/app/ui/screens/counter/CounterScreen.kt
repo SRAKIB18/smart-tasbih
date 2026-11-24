@@ -78,6 +78,7 @@ import com.ruhutasbih.app.R
 import com.ruhutasbih.app.ui.theme.ArabicGoldText
 import com.ruhutasbih.app.ui.theme.PendingBadgeOrange
 import com.ruhutasbih.app.ui.theme.TargetProgressGreen
+import com.ruhutasbih.app.ui.util.AudioReciter
 import com.ruhutasbih.app.ui.util.HapticManager
 import com.ruhutasbih.app.ui.util.SoundManager
 
@@ -98,10 +99,13 @@ fun CounterScreen(
 
     val soundManager = remember { SoundManager(context) }
     val hapticManager = remember { HapticManager(context) }
+    val audioReciter = remember { AudioReciter(context) }
+    var isSpeakingAudio by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         onDispose {
             soundManager.release()
+            audioReciter.release()
         }
     }
 
@@ -177,8 +181,8 @@ fun CounterScreen(
                         }
                         IconButton(onClick = {
                             viewModel.toggleLock()
-                            val msgRes = if (!isLocked) R.string.counter_locked else R.string.counter_unlocked
-                            Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+                            val msg = if (!isLocked) "কাউন্টার লক করা হয়েছে" else "কাউন্টার আনলক করা হয়েছে"
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                         }) {
                             Icon(
                                 imageVector = if (isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
@@ -239,8 +243,8 @@ fun CounterScreen(
                     }
                     IconButton(onClick = {
                         viewModel.toggleLock()
-                        val msgRes = if (!isLocked) R.string.counter_locked else R.string.counter_unlocked
-                        Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+                        val msg = if (!isLocked) "কাউন্টার লক করা হয়েছে" else "কাউন্টার আনলক করা হয়েছে"
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     }) {
                         Icon(
                             imageVector = if (isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
@@ -335,6 +339,50 @@ fun CounterScreen(
                             )
                         )
                     }
+
+                    // Audio Recitation Play / Pause Button
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = if (isSpeakingAudio) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = if (isSpeakingAudio) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                        ),
+                        modifier = Modifier.clickable {
+                            if (isSpeakingAudio) {
+                                audioReciter.stop()
+                                isSpeakingAudio = false
+                            } else {
+                                val textToRecite = currentTasbih.arabicText.ifBlank { currentTasbih.name }
+                                audioReciter.speak(
+                                    text = textToRecite,
+                                    onStart = { isSpeakingAudio = true },
+                                    onDone = { isSpeakingAudio = false }
+                                )
+                            }
+                        }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                                contentDescription = "Audio Recitation",
+                                tint = if (isSpeakingAudio) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (isSpeakingAudio) stringResource(R.string.stop_audio) else stringResource(R.string.play_audio),
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSpeakingAudio) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                )
+                            )
+                        }
+                    }
                 }
             }
 
@@ -363,11 +411,7 @@ fun CounterScreen(
                         indication = null
                     ) {
                         if (isLocked) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.counter_locked_hint),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(context, "গণনা করতে প্যাডলক আইকনে ট্যাপ করে আনলক করুন", Toast.LENGTH_SHORT).show()
                         } else {
                             if (soundEnabled) soundManager.playClickSound()
                             if (vibrationEnabled) hapticManager.vibrateClick()
@@ -432,7 +476,7 @@ fun CounterScreen(
                                     .padding(8.dp)
                                     .clickable {
                                         viewModel.toggleLock()
-                                        Toast.makeText(context, context.getString(R.string.counter_unlocked), Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "কাউন্টার আনলক করা হয়েছে", Toast.LENGTH_SHORT).show()
                                     }
                             ) {
                                 Row(
@@ -526,7 +570,7 @@ fun CounterScreen(
                 TextButton(
                     onClick = {
                         if (isLocked) {
-                            Toast.makeText(context, context.getString(R.string.counter_locked_hint), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "গণনা করতে প্যাডলক আইকনে ট্যাপ করে আনলক করুন", Toast.LENGTH_SHORT).show()
                         } else {
                             viewModel.undoCount()
                         }
@@ -543,7 +587,7 @@ fun CounterScreen(
                 TextButton(
                     onClick = {
                         if (isLocked) {
-                            Toast.makeText(context, context.getString(R.string.counter_locked_hint), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "গণনা করতে প্যাডলক আইকনে ট্যাপ করে আনলক করুন", Toast.LENGTH_SHORT).show()
                         } else {
                             showResetDialog = true
                         }
