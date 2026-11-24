@@ -1,0 +1,118 @@
+<resources>
+    <string name="app_name">স্মার্ট তাসবিহ</string>
+    <string name="app_subtitle">ডিজিটাল জিকির কাউন্টার</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">হোম</string>
+    <string name="nav_tasbih">তাসবিহ লাইব্রেরি</string>
+    <string name="nav_counter">কাউন্টার</string>
+    <string name="nav_history">ইতিহাস</string>
+    <string name="nav_settings">সেটিংস</string>
+
+    <!-- Dashboard -->
+    <string name="greeting_title">আসসালামু আলাইকুম</string>
+    <string name="greeting_subtitle">আল্লাহ আপনার আজকের দিনটি জিকির দ্বারা বরকতময় করুন</string>
+    <string name="stat_today_count">আজকের জিকির</string>
+    <string name="stat_targets_completed">সম্পন্ন টার্গেট</string>
+    <string name="stat_active_tasbihs">সক্রিয় তাসবিহ</string>
+    <string name="stat_overall_progress">দৈনিক অগ্রগতি</string>
+    <string name="recent_tasbih">সাম্প্রতিক তাসবিহ</string>
+    <string name="all_tasbih">সকল তাসবিহ</string>
+    <string name="add_new_tasbih">নতুন তাসবিহ যোগ করুন</string>
+    <string name="search_placeholder">জিকির বা অর্থ খুঁজুন…</string>
+    <string name="filter_all">সব</string>
+    <string name="filter_pinned">পিন করা</string>
+    <string name="filter_active">সক্রিয়</string>
+    <string name="filter_archived">আর্কাইভড</string>
+
+    <!-- Tasbih Fields -->
+    <string name="tasbih_name">তাসবিহের নাম</string>
+    <string name="arabic_text">আরবি টেক্সট</string>
+    <string name="transliteration">উচ্চারণ</string>
+    <string name="meaning">অর্থ / অনুবাদ</string>
+    <string name="daily_target">দৈনিক টার্গেট</string>
+    <string name="previous_pending">পূর্বের পেন্ডিং</string>
+    <string name="pending_remaining">অবশিষ্ট পেন্ডিং</string>
+    <string name="next_day_pending">আগামীকালের পেন্ডিং</string>
+    <string name="today_reading">আজকের পাঠ</string>
+    <string name="daily_count">দৈনিক কাউন্ট</string>
+    <string name="lifetime_count">সর্বমোট জিকির</string>
+    <string name="notes">নোট</string>
+    <string name="category">ক্যাটাগরি</string>
+    <string name="status_completed">টার্গেট সম্পন্ন!</string>
+    <string name="status_in_progress">চলমান</string>
+
+    <!-- Dialogs & Actions -->
+    <string name="action_save">সংরক্ষণ করুন</string>
+    <string name="action_cancel">বাতিল</string>
+    <string name="action_delete">মুছে ফেলুন</string>
+    <string name="action_edit">এডিট করুন</string>
+    <string name="action_duplicate">ডুপ্লিকেট করুন</string>
+    <string name="action_pin">পিন করুন</string>
+    <string name="action_unpin">আনপিন করুন</string>
+    <string name="action_archive">আর্কাইভ করুন</string>
+    <string name="action_unarchive">আনআর্কাইভ করুন</string>
+    <string name="action_reset">রিসেট</string>
+    <string name="action_undo">পূর্বাবস্থায় ফেরান</string>
+    <string name="action_confirm">নিশ্চিত করুন</string>
+
+    <!-- Counter Screen -->
+    <string name="tap_to_count">গণনা করতে ট্যাপ করুন</string>
+    <string name="sound_enabled">শব্দ চালু</string>
+    <string name="sound_disabled">শব্দ বন্ধ</string>
+    <string name="vibration_enabled">ভাইব্রেশন চালু</string>
+    <string name="vibration_disabled">ভাইব্রেশন বন্ধ</string>
+    <string name="keep_awake_on">স্ক্রিন সজাগ চালু</string>
+    <string name="keep_awake_off">স্ক্রিন সজাগ বন্ধ</string>
+    <string name="reset_confirmation_title">আজকের গণনা রিসেট করবেন?</string>
+    <string name="reset_confirmation_msg">আপনি কি নিশ্চিত যে এই তাসবিহের আজকের গণনা রিসেট করতে চান? এটি পুনরায় ফিরে পাওয়া যাবে না।</string>
+    <string name="target_achieved_toast">মাশাআল্লাহ! আজকের টার্গেট সম্পন্ন হয়েছে!</string>
+
+    <!-- History -->
+    <string name="history_title">কার্যক্রম ও ইতিহাস</string>
+    <string name="tab_daily">দৈনিক</string>
+    <string name="tab_weekly">সাপ্তাহিক</string>
+    <string name="tab_monthly">মাসিক</string>
+    <string name="tab_yearly">বার্ষিক</string>
+    <string name="completion_rate">টার্গেট পূরণের হার</string>
+    <string name="pending_carried_forward">পরবর্তী দিনে স্থানান্তরিত পেন্ডিং</string>
+    <string name="no_history_records">এই সময়সীমার কোনো রেকর্ড পাওয়া যায়নি।</string>
+
+    <!-- Settings -->
+    <string name="settings_title">অ্যাপ্লিকেশন সেটিংস</string>
+    <string name="sec_appearance">চেহারা ও ভাষা</string>
+    <string name="theme_mode">অ্যাপ থিম</string>
+    <string name="theme_light">লাইট</string>
+    <string name="theme_dark">ডার্ক</string>
+    <string name="theme_system">সিস্টেম ডিফল্ট</string>
+    <string name="app_language">অ্যাপের ভাষা</string>
+    <string name="lang_bangla">বাংলা (Bangla)</string>
+    <string name="lang_english">English</string>
+
+    <string name="sec_counter_prefs">কাউন্টার পছন্দসমূহ</string>
+    <string name="default_target_label">ডিফল্ট দৈনিক টার্গেট</string>
+    <string name="haptic_feedback_label">ভাইব্রেশন প্রতিক্রিয়া</string>
+    <string name="click_sound_label">ক্লিক শব্দ</string>
+    <string name="keep_screen_awake_label">স্ক্রিন অন রাখুন</string>
+
+    <string name="sec_notifications">স্মারক ও নোটিফিকেশন</string>
+    <string name="daily_reminder_label">দৈনিক জিকির রিমাইন্ডার</string>
+    <string name="reminder_time_label">রিমাইন্ডারের সময়</string>
+
+    <string name="sec_data_safety">ডাটা ব্যবস্থাপনা ও ব্যাকআপ</string>
+    <string name="backup_json">ডাটা ব্যাকআপ (JSON)</string>
+    <string name="restore_json">ডাটা রিস্টোর (JSON)</string>
+    <string name="export_csv">CSV ফরম্যাটে ইতিহাস এক্সপোর্ট</string>
+    <string name="clear_history">ইতিহাস ক্লিয়ার করুন</string>
+    <string name="reset_app_data">অ্যাপ্লিকেশন রিসেট করুন</string>
+
+    <string name="sec_about">স্মার্ট তাসবিহ সম্পর্কে</string>
+    <string name="version_label">ভার্সন ১.০.০ (অফলাইন ফার্স্ট)</string>
+    <string name="developer_info">আন্তরিক ভালোবাসায় নির্মিত</string>
+    <string name="privacy_policy">গোপনীয়তা নীতি: ১০০% লোকাল স্টোরেজ, কোনো ক্লাউড সিঙ্ক বা ডাটা সংগ্রহ করা হয় না।</string>
+
+    <string name="confirm_clear_history_title">সকল ইতিহাস মুছে ফেলবেন?</string>
+    <string name="confirm_clear_history_msg">এটি স্থায়ীভাবে সমস্ত দৈনিক ইতিহাস রেকর্ড মুছে ফেলবে। আপনার তাসবিহের তালিকা অপরিবর্তিত থাকবে।</string>
+    <string name="confirm_reset_app_title">অ্যাপ ডাটা রিসেট করবেন?</string>
+    <string name="confirm_reset_app_msg">সতর্কতা: এটি সমস্ত তাসবিহ, গণনা, ইতিহাস এবং পছন্দসমূহ প্রাথমিক অবস্থায় ফিরিয়ে নেবে!</string>
+</resources>

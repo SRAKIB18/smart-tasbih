@@ -1,3 +1,118 @@
 <resources>
-    <string name="app_name">Ruhu Tasbih</string>
+    <string name="app_name">Smart Tasbih</string>
+    <string name="app_subtitle">Digital Dhikr Counter</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_tasbih">Tasbih Library</string>
+    <string name="nav_counter">Counter</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Dashboard -->
+    <string name="greeting_title">Assalamu Alaikum</string>
+    <string name="greeting_subtitle">May Allah bless your day with remembrance</string>
+    <string name="stat_today_count">Today\'s Count</string>
+    <string name="stat_targets_completed">Completed Targets</string>
+    <string name="stat_active_tasbihs">Active Tasbihs</string>
+    <string name="stat_overall_progress">Daily Progress</string>
+    <string name="recent_tasbih">Recent Tasbih</string>
+    <string name="all_tasbih">All Tasbihs</string>
+    <string name="add_new_tasbih">Add New Tasbih</string>
+    <string name="search_placeholder">Search Dhikr or Meaning…</string>
+    <string name="filter_all">All</string>
+    <string name="filter_pinned">Pinned</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_archived">Archived</string>
+
+    <!-- Tasbih Fields -->
+    <string name="tasbih_name">Tasbih Name</string>
+    <string name="arabic_text">Arabic Text</string>
+    <string name="transliteration">Transliteration</string>
+    <string name="meaning">Translation / Meaning</string>
+    <string name="daily_target">Daily Target</string>
+    <string name="previous_pending">Previous Pending</string>
+    <string name="pending_remaining">Pending Remaining</string>
+    <string name="next_day_pending">Next Day Pending</string>
+    <string name="today_reading">Today\'s Reading</string>
+    <string name="daily_count">Daily Count</string>
+    <string name="lifetime_count">Lifetime Total</string>
+    <string name="notes">Notes</string>
+    <string name="category">Category</string>
+    <string name="status_completed">Target Reached!</string>
+    <string name="status_in_progress">In Progress</string>
+
+    <!-- Dialogs & Actions -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_duplicate">Duplicate</string>
+    <string name="action_pin">Pin</string>
+    <string name="action_unpin">Unpin</string>
+    <string name="action_archive">Archive</string>
+    <string name="action_unarchive">Unarchive</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_confirm">Confirm</string>
+
+    <!-- Counter Screen -->
+    <string name="tap_to_count">Tap to Count</string>
+    <string name="sound_enabled">Sound ON</string>
+    <string name="sound_disabled">Sound OFF</string>
+    <string name="vibration_enabled">Vibration ON</string>
+    <string name="vibration_disabled">Vibration OFF</string>
+    <string name="keep_awake_on">Screen Awake ON</string>
+    <string name="keep_awake_off">Screen Awake OFF</string>
+    <string name="reset_confirmation_title">Reset Today\'s Count?</string>
+    <string name="reset_confirmation_msg">Are you sure you want to reset today\'s reading for this Tasbih? This action cannot be undone.</string>
+    <string name="target_achieved_toast">MashaAllah! Daily Target Completed!</string>
+
+    <!-- History -->
+    <string name="history_title">Activity &amp; History</string>
+    <string name="tab_daily">Daily</string>
+    <string name="tab_weekly">Weekly</string>
+    <string name="tab_monthly">Monthly</string>
+    <string name="tab_yearly">Yearly</string>
+    <string name="completion_rate">Completion Rate</string>
+    <string name="pending_carried_forward">Pending Carried Forward</string>
+    <string name="no_history_records">No records found for this period.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Application Settings</string>
+    <string name="sec_appearance">Appearance &amp; Language</string>
+    <string name="theme_mode">App Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System Default</string>
+    <string name="app_language">App Language</string>
+    <string name="lang_bangla">বাংলা (Bangla)</string>
+    <string name="lang_english">English</string>
+
+    <string name="sec_counter_prefs">Counter Preferences</string>
+    <string name="default_target_label">Default Daily Target</string>
+    <string name="haptic_feedback_label">Vibration Feedback</string>
+    <string name="click_sound_label">Click Sound</string>
+    <string name="keep_screen_awake_label">Keep Screen Awake</string>
+
+    <string name="sec_notifications">Reminders &amp; Notifications</string>
+    <string name="daily_reminder_label">Daily Dhikr Reminder</string>
+    <string name="reminder_time_label">Reminder Time</string>
+
+    <string name="sec_data_safety">Data Management &amp; Backup</string>
+    <string name="backup_json">Backup Data (JSON)</string>
+    <string name="restore_json">Restore Data (JSON)</string>
+    <string name="export_csv">Export History to CSV</string>
+    <string name="clear_history">Clear History Logs</string>
+    <string name="reset_app_data">Reset Application</string>
+
+    <string name="sec_about">About Smart Tasbih</string>
+    <string name="version_label">Version 1.0.0 (Offline First)</string>
+    <string name="developer_info">Built with Love &amp; Devotion</string>
+    <string name="privacy_policy">Privacy First: 100% Local Storage, No Cloud Sync or Data Collection.</string>
+
+    <string name="confirm_clear_history_title">Clear All History?</string>
+    <string name="confirm_clear_history_msg">This will permanently delete all daily history logs. Your Tasbih definitions and targets will remain intact.</string>
+    <string name="confirm_reset_app_title">Reset Application Data?</string>
+    <string name="confirm_reset_app_msg">WARNING: This will wipe all Tasbihs, counts, history, and preferences back to initial state!</string>
 </resources>

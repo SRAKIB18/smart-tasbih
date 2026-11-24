@@ -1,0 +1,121 @@
+package com.ruhutasbih.app.ui.screens.home
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.ruhutasbih.app.data.local.entity.TasbihEntity
+import com.ruhutasbih.app.domain.repository.TasbihRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
+data class HomeUiState(
+    val tasbihList: List<TasbihEntity> = emptyList(),
+    val todayTotalReading: Long = 0L,
+    val completedTargetsCount: Int = 0,
+    val activeTasbihsCount: Int = 0,
+    val overallProgress: Float = 0f,
+    val searchQuery: String = "",
+    val filterMode: String = "ALL" // "ALL", "PINNED", "ACTIVE", "ARCHIVED"
+)
+
+class HomeViewModel(
+    private val repository: TasbihRepository
+) : ViewModel() {
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
+    private val _filterMode = MutableStateFlow("ALL")
+    val filterMode: StateFlow<String> = _filterMode
+
+    val uiState: StateFlow<HomeUiState> = combine(
+        repository.getAllTasbihs(),
+        _searchQuery,
+        _filterMode
+    ) { tasbihs, query, filter ->
+        viewModelScope.launch {
+            repository.checkAndApplyDateRollover()
+        }
+
+        val filteredByMode = when (filter) {
+            "PINNED" -> tasbihs.filter { it.isPinned && !it.isArchived }
+            "ACTIVE" -> tasbihs.filter { !it.isArchived }
+            "ARCHIVED" -> tasbihs.filter { it.isArchived }
+            else -> tasbihs.filter { !it.isArchived }
+        }
+
+        val finalFiltered = if (query.isBlank()) {
+            filteredByMode
+        } else {
+            filteredByMode.filter {
+                it.name.contains(query, ignoreCase = true) ||
+                it.transliteration.contains(query, ignoreCase = true) ||
+                it.meaning.contains(query, ignoreCase = true) ||
+                it.arabicText.contains(query)
+            }
+        }
+
+        val activeTasbihs = tasbihs.filter { !it.isArchived }
+        val todayTotal = activeTasbihs.sumOf { it.todayReading }
+        val completedCount = activeTasbihs.count { it.todayReading >= it.dailyTarget }
+        val activeCount = activeTasbihs.size
+
+        val totalTargets = activeTasbihs.sumOf { it.dailyTarget }
+        val overallProgress = if (totalTargets > 0) {
+            (todayTotal.toFloat() / totalTargets.toFloat()).coerceIn(0f, 1f)
+        } else {
+            0f
+        }
+
+        HomeUiState(
+            tasbihList = finalFiltered,
+            todayTotalReading = todayTotal,
+            completedTargetsCount = completedCount,
+            activeTasbihsCount = activeCount,
+            overallProgress = overallProgress,
+            searchQuery = query,
+            filterMode = filter
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = HomeUiState()
+    )
+
+    fun onSearchQueryChanged(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun onFilterModeChanged(filter: String) {
+        _filterMode.value = filter
+    }
+
+    fun togglePin(id: String, currentPinned: Boolean) {
+        viewModelScope.launch {
+            repository.setPinnedState(id, !currentPinned)
+        }
+    }
+
+    fun toggleArchive(id: String, currentArchived: Boolean) {
+        viewModelScope.launch {
+            repository.setArchivedState(id, !currentArchived)
+        }
+    }
+
+    fun deleteTasbih(id: String) {
+        viewModelScope.launch {
+            repository.deleteTasbih(id)
+        }
+    }
+
+    class Factory(private val repository: TasbihRepository) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return HomeViewModel(repository) as T
+        }
+    }
+}
