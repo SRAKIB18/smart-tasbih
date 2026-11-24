@@ -70,6 +70,9 @@
     <string name="counter_locked">কাউন্টার লক করা আছে</string>
     <string name="counter_locked_hint">গণনা করতে প্যাডলক আইকনে ট্যাপ করে আনলক করুন</string>
     <string name="counter_unlocked">কাউন্টার আনলক করা হয়েছে</string>
+    <string name="play_audio">আরবি উচ্চারণ শুনুন</string>
+    <string name="stop_audio">অডিও বন্ধ করুন</string>
+    <string name="audio_pronunciation">আরবি উচ্চারণ</string>
 
     <!-- History -->
     <string name="history_title">কার্যক্রম ও ইতিহাস</string>

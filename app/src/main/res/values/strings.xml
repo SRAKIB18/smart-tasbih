@@ -70,6 +70,9 @@
     <string name="counter_locked">Counter Locked</string>
     <string name="counter_locked_hint">Tap padlock icon to unlock counter</string>
     <string name="counter_unlocked">Counter Unlocked</string>
+    <string name="play_audio">Listen Arabic Recitation</string>
+    <string name="stop_audio">Stop Recitation</string>
+    <string name="audio_pronunciation">Arabic Recitation</string>
 
     <!-- History -->
     <string name="history_title">Activity &amp; History</string>
