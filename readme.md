@@ -8,6 +8,7 @@
 - **সুবিধা**: ইউজারকে অ্যাপ না খুলেই ফোনের হোম স্ক্রিন থেকেই সরাসরি এক ক্লিকে জিকির কাউন্ট বাড়াতে সাহায্য করবে।
 audio -> male voice hobe.
 title ta thik nai broken hocce.
+aro sundor kore deo ,, aro prfessional attractive
 
 ---
 
