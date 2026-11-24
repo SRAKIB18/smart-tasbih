@@ -67,6 +67,9 @@
     <string name="reset_confirmation_title">Reset Today\'s Count?</string>
     <string name="reset_confirmation_msg">Are you sure you want to reset today\'s reading for this Tasbih? This action cannot be undone.</string>
     <string name="target_achieved_toast">MashaAllah! Daily Target Completed!</string>
+    <string name="counter_locked">Counter Locked</string>
+    <string name="counter_locked_hint">Tap padlock icon to unlock counter</string>
+    <string name="counter_unlocked">Counter Unlocked</string>
 
     <!-- History -->
     <string name="history_title">Activity &amp; History</string>

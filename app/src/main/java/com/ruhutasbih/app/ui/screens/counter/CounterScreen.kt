@@ -2,8 +2,13 @@ package com.ruhutasbih.app.ui.screens.counter
 
 import android.app.Activity
 import android.view.WindowManager
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,8 +34,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Refresh
@@ -57,6 +64,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -86,6 +94,7 @@ fun CounterScreen(
     val vibrationEnabled by viewModel.vibrationEnabled.collectAsState()
     val keepScreenAwake by viewModel.keepScreenAwake.collectAsState()
     val isFullScreen by viewModel.isFullScreen.collectAsState()
+    val isLocked by viewModel.isLocked.collectAsState()
 
     val soundManager = remember { SoundManager(context) }
     val hapticManager = remember { HapticManager(context) }
@@ -112,6 +121,8 @@ fun CounterScreen(
     var showResetDialog by remember { mutableStateOf(false) }
 
     val currentTasbih = tasbih ?: return
+
+    val isTargetReached = currentTasbih.dailyTarget > 0 && currentTasbih.todayReading >= currentTasbih.dailyTarget
 
     val progress = if (currentTasbih.dailyTarget > 0) {
         (currentTasbih.todayReading.toFloat() / currentTasbih.dailyTarget.toFloat()).coerceIn(0f, 1f)
@@ -159,9 +170,20 @@ fun CounterScreen(
                         }
                         IconButton(onClick = { viewModel.toggleKeepScreenAwake() }) {
                             Icon(
-                                imageVector = if (keepScreenAwake) Icons.Default.Lock else Icons.Default.LockOpen,
+                                imageVector = Icons.Default.LightMode,
                                 contentDescription = "Keep Screen Awake",
-                                tint = if (keepScreenAwake) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = if (keepScreenAwake) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        IconButton(onClick = {
+                            viewModel.toggleLock()
+                            val msgRes = if (!isLocked) R.string.counter_locked else R.string.counter_unlocked
+                            Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+                        }) {
+                            Icon(
+                                imageVector = if (isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
+                                contentDescription = "Lock Counter",
+                                tint = if (isLocked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         IconButton(onClick = { viewModel.toggleFullScreen() }) {
@@ -186,6 +208,89 @@ fun CounterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // Floating Toolbar when in FullScreen Mode
+            if (isFullScreen) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { viewModel.toggleSound() }) {
+                        Icon(
+                            imageVector = if (soundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
+                            contentDescription = "Toggle Sound"
+                        )
+                    }
+                    IconButton(onClick = { viewModel.toggleVibration() }) {
+                        Icon(
+                            imageVector = Icons.Default.Vibration,
+                            contentDescription = "Toggle Vibration",
+                            tint = if (vibrationEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(onClick = { viewModel.toggleKeepScreenAwake() }) {
+                        Icon(
+                            imageVector = Icons.Default.LightMode,
+                            contentDescription = "Keep Screen Awake",
+                            tint = if (keepScreenAwake) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(onClick = {
+                        viewModel.toggleLock()
+                        val msgRes = if (!isLocked) R.string.counter_locked else R.string.counter_unlocked
+                        Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+                    }) {
+                        Icon(
+                            imageVector = if (isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
+                            contentDescription = "Lock Counter",
+                            tint = if (isLocked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(onClick = { viewModel.toggleFullScreen() }) {
+                        Icon(
+                            imageVector = Icons.Default.FullscreenExit,
+                            contentDescription = "Exit Full Screen"
+                        )
+                    }
+                }
+            }
+
+            // Target Completion Pill Badge
+            AnimatedVisibility(
+                visible = isTargetReached,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = TargetProgressGreen.copy(alpha = 0.15f),
+                    border = BorderStroke(1.dp, TargetProgressGreen.copy(alpha = 0.6f)),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Target Completed",
+                            tint = TargetProgressGreen,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.target_achieved_toast),
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = TargetProgressGreen,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+            }
+
             // Arabic Text & Transliteration Card
             Card(
                 modifier = Modifier
@@ -237,13 +342,13 @@ fun CounterScreen(
             val interactionSource = remember { MutableInteractionSource() }
             val isPressed by interactionSource.collectIsPressedAsState()
             val scale by animateFloatAsState(
-                targetValue = if (isPressed) 0.92f else 1.0f,
+                targetValue = if (isPressed && !isLocked) 0.92f else 1.0f,
                 animationSpec = tween(durationMillis = 100),
                 label = "ButtonScale"
             )
 
             val trackColor = MaterialTheme.colorScheme.surfaceVariant
-            val activeColor = if (currentTasbih.todayReading >= currentTasbih.dailyTarget) TargetProgressGreen else MaterialTheme.colorScheme.primary
+            val activeColor = if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.primary
 
             Box(
                 contentAlignment = Alignment.Center,
@@ -257,9 +362,17 @@ fun CounterScreen(
                         interactionSource = interactionSource,
                         indication = null
                     ) {
-                        if (soundEnabled) soundManager.playClickSound()
-                        if (vibrationEnabled) hapticManager.vibrateClick()
-                        viewModel.incrementCount(1L)
+                        if (isLocked) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.counter_locked_hint),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            if (soundEnabled) soundManager.playClickSound()
+                            if (vibrationEnabled) hapticManager.vibrateClick()
+                            viewModel.incrementCount(1L)
+                        }
                     }
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
@@ -279,30 +392,70 @@ fun CounterScreen(
 
                 Surface(
                     shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surface,
+                    color = if (isLocked) MaterialTheme.colorScheme.surface.copy(alpha = 0.85f) else MaterialTheme.colorScheme.surface,
                     shadowElevation = 8.dp,
                     modifier = Modifier.size(230.dp)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Text(
-                            text = currentTasbih.todayReading.toString(),
-                            style = MaterialTheme.typography.displayLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 54.sp,
-                                color = MaterialTheme.colorScheme.onSurface
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = currentTasbih.todayReading.toString(),
+                                style = MaterialTheme.typography.displayLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 54.sp,
+                                    color = if (isLocked) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurface
+                                )
                             )
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.tap_to_count),
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.SemiBold
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = if (isLocked) stringResource(R.string.counter_locked) else stringResource(R.string.tap_to_count),
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    color = if (isLocked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
+                        }
+
+                        // Lock Badge Overlay
+                        if (isLocked) {
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.errorContainer,
+                                shadowElevation = 4.dp,
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .clickable {
+                                        viewModel.toggleLock()
+                                        Toast.makeText(context, context.getString(R.string.counter_unlocked), Toast.LENGTH_SHORT).show()
+                                    }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Lock,
+                                        contentDescription = "Locked",
+                                        tint = MaterialTheme.colorScheme.onErrorContainer,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = stringResource(R.string.counter_locked),
+                                        style = MaterialTheme.typography.labelMedium.copy(
+                                            color = MaterialTheme.colorScheme.onErrorContainer,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -371,7 +524,13 @@ fun CounterScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextButton(
-                    onClick = { viewModel.undoCount() }
+                    onClick = {
+                        if (isLocked) {
+                            Toast.makeText(context, context.getString(R.string.counter_locked_hint), Toast.LENGTH_SHORT).show()
+                        } else {
+                            viewModel.undoCount()
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Undo,
@@ -382,7 +541,13 @@ fun CounterScreen(
                 }
 
                 TextButton(
-                    onClick = { showResetDialog = true }
+                    onClick = {
+                        if (isLocked) {
+                            Toast.makeText(context, context.getString(R.string.counter_locked_hint), Toast.LENGTH_SHORT).show()
+                        } else {
+                            showResetDialog = true
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
@@ -427,7 +592,7 @@ fun CounterScreen(
 private fun StatMetricItem(
     label: String,
     value: String,
-    color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface
+    color: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(

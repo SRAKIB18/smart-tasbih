@@ -30,6 +30,9 @@ class CounterViewModel(
     private val _isFullScreen = MutableStateFlow(false)
     val isFullScreen: StateFlow<Boolean> = _isFullScreen.asStateFlow()
 
+    private val _isLocked = MutableStateFlow(false)
+    val isLocked: StateFlow<Boolean> = _isLocked.asStateFlow()
+
     init {
         viewModelScope.launch {
             repository.getTasbihByIdFlow(tasbihId).collect {
@@ -70,6 +73,10 @@ class CounterViewModel(
 
     fun toggleFullScreen() {
         _isFullScreen.value = !_isFullScreen.value
+    }
+
+    fun toggleLock() {
+        _isLocked.value = !_isLocked.value
     }
 
     class Factory(

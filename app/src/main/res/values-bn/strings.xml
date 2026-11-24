@@ -67,6 +67,9 @@
     <string name="reset_confirmation_title">আজকের গণনা রিসেট করবেন?</string>
     <string name="reset_confirmation_msg">আপনি কি নিশ্চিত যে এই তাসবিহের আজকের গণনা রিসেট করতে চান? এটি পুনরায় ফিরে পাওয়া যাবে না।</string>
     <string name="target_achieved_toast">মাশাআল্লাহ! আজকের টার্গেট সম্পন্ন হয়েছে!</string>
+    <string name="counter_locked">কাউন্টার লক করা আছে</string>
+    <string name="counter_locked_hint">গণনা করতে প্যাডলক আইকনে ট্যাপ করে আনলক করুন</string>
+    <string name="counter_unlocked">কাউন্টার আনলক করা হয়েছে</string>
 
     <!-- History -->
     <string name="history_title">কার্যক্রম ও ইতিহাস</string>
