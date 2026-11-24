@@ -1,6 +1,12 @@
 package com.ruhutasbih.app.ui.screens.history
 
 import android.graphics.Paint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -558,11 +564,10 @@ private fun ProfessionalCurveAreaChart(
         }
     }
 
-    Column(modifier = modifier) {
+    Box(modifier = modifier) {
         Canvas(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
                 .pointerInput(data) {
                     detectTapGestures { offset ->
                         if (data.isEmpty()) return@detectTapGestures
@@ -584,7 +589,7 @@ private fun ProfessionalCurveAreaChart(
             val maxVal = maxOf(1L, data.maxOf { it.second })
             val count = data.size
             val availableWidth = size.width
-            val topPadding = 35.dp.toPx()
+            val topPadding = 45.dp.toPx()
             val bottomPadding = 32.dp.toPx()
             val usableHeight = size.height - topPadding - bottomPadding
 
@@ -702,22 +707,25 @@ private fun ProfessionalCurveAreaChart(
             }
         }
 
-        // Sleek Compact Bottom Inspect Info Badge
-        if (selectedIndex != null && selectedIndex!! in data.indices) {
-            val selectedItem = data[selectedIndex!!]
-            Spacer(modifier = Modifier.height(6.dp))
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+        // Absolute Positioned Top Overlay Inspection Banner
+        AnimatedVisibility(
+            visible = selectedIndex != null && selectedIndex!! in data.indices,
+            enter = fadeIn() + slideInVertically { -it / 2 },
+            exit = fadeOut() + slideOutVertically { -it / 2 },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+        ) {
+            if (selectedIndex != null && selectedIndex!! in data.indices) {
+                val selectedItem = data[selectedIndex!!]
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shadowElevation = 6.dp,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
                 ) {
                     Row(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -731,21 +739,20 @@ private fun ProfessionalCurveAreaChart(
                             text = "${selectedItem.first}: ${selectedItem.second} counts",
                             style = MaterialTheme.typography.labelMedium.copy(
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                fontWeight = FontWeight.SemiBold,
+                                fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
                             )
                         )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "✕",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier.clickable { selectedIndex = null }
+                        )
                     }
-
-                    Text(
-                        text = "✕",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        ),
-                        modifier = Modifier.clickable { selectedIndex = null }
-                    )
                 }
             }
         }
@@ -786,11 +793,10 @@ private fun ProfessionalBarChart(
         }
     }
 
-    Column(modifier = modifier) {
+    Box(modifier = modifier) {
         Canvas(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
                 .pointerInput(data) {
                     detectTapGestures { offset ->
                         if (data.isEmpty()) return@detectTapGestures
@@ -814,7 +820,7 @@ private fun ProfessionalBarChart(
             val maxVal = maxOf(1L, data.maxOf { it.second })
             val count = data.size
             val availableWidth = size.width
-            val topPadding = 35.dp.toPx()
+            val topPadding = 45.dp.toPx()
             val bottomPadding = 32.dp.toPx()
             val usableHeight = size.height - topPadding - bottomPadding
 
@@ -915,22 +921,25 @@ private fun ProfessionalBarChart(
             }
         }
 
-        // Sleek Compact Bottom Inspect Info Badge
-        if (selectedIndex != null && selectedIndex!! in data.indices) {
-            val selectedItem = data[selectedIndex!!]
-            Spacer(modifier = Modifier.height(6.dp))
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+        // Absolute Positioned Top Overlay Inspection Banner
+        AnimatedVisibility(
+            visible = selectedIndex != null && selectedIndex!! in data.indices,
+            enter = fadeIn() + slideInVertically { -it / 2 },
+            exit = fadeOut() + slideOutVertically { -it / 2 },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+        ) {
+            if (selectedIndex != null && selectedIndex!! in data.indices) {
+                val selectedItem = data[selectedIndex!!]
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shadowElevation = 6.dp,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
                 ) {
                     Row(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -944,21 +953,20 @@ private fun ProfessionalBarChart(
                             text = "${selectedItem.first}: ${selectedItem.second} counts",
                             style = MaterialTheme.typography.labelMedium.copy(
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                fontWeight = FontWeight.SemiBold,
+                                fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
                             )
                         )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "✕",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier.clickable { selectedIndex = null }
+                        )
                     }
-
-                    Text(
-                        text = "✕",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        ),
-                        modifier = Modifier.clickable { selectedIndex = null }
-                    )
                 }
             }
         }

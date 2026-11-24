@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,6 +45,7 @@ import com.ruhutasbih.app.R
 import com.ruhutasbih.app.data.local.entity.TasbihEntity
 import com.ruhutasbih.app.ui.components.AddEditTasbihDialog
 import com.ruhutasbih.app.ui.components.TasbihCard
+import com.ruhutasbih.app.ui.util.AudioReciter
 import com.ruhutasbih.app.ui.screens.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,9 +56,17 @@ fun TasbihListScreen(
     onSaveTasbih: (TasbihEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var tasbihToEdit by remember { mutableStateOf<TasbihEntity?>(null) }
+
+    val audioReciter = remember { AudioReciter(context) }
+    DisposableEffect(Unit) {
+        onDispose {
+            audioReciter.release()
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -195,7 +206,11 @@ fun TasbihListScreen(
                             showAddDialog = true
                         },
                         onDelete = { viewModel.deleteTasbih(tasbih.id) },
-                        onQuickIncrement = { viewModel.quickIncrement(tasbih.id) }
+                        onQuickIncrement = { viewModel.quickIncrement(tasbih.id) },
+                        onPlayAudio = {
+                            val textToRecite = tasbih.arabicText.ifBlank { tasbih.name }
+                            audioReciter.speak(textToRecite)
+                        }
                     )
                 }
             }

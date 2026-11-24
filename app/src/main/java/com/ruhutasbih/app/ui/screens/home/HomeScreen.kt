@@ -276,7 +276,11 @@ fun HomeScreen(
                             showAddDialog = true
                         },
                         onDelete = { viewModel.deleteTasbih(tasbih.id) },
-                        onQuickIncrement = { viewModel.quickIncrement(tasbih.id) }
+                        onQuickIncrement = { viewModel.quickIncrement(tasbih.id) },
+                        onPlayAudio = {
+                            val textToRecite = tasbih.arabicText.ifBlank { tasbih.name }
+                            audioReciter.speak(textToRecite)
+                        }
                     )
                 }
             }

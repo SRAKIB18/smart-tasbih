@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PushPin
@@ -60,6 +61,7 @@ fun TasbihCard(
     onDuplicate: () -> Unit,
     onDelete: () -> Unit,
     onQuickIncrement: (() -> Unit)? = null,
+    onPlayAudio: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -171,18 +173,40 @@ fun TasbihCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Arabic Text (Large & RTL Centered / Right Aligned)
+            // Arabic Text (Large & RTL Centered / Right Aligned) with Audio Button
             if (tasbih.arabicText.isNotBlank()) {
-                Text(
-                    text = tasbih.arabicText,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        color = ArabicGoldText,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
-                        textAlign = TextAlign.End
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (onPlayAudio != null) {
+                        IconButton(
+                            onClick = onPlayAudio,
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                                contentDescription = "Audio Recitation",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(1.dp))
+                    }
+
+                    Text(
+                        text = tasbih.arabicText,
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            color = ArabicGoldText,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.End
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
                 Spacer(modifier = Modifier.height(6.dp))
             }
 
