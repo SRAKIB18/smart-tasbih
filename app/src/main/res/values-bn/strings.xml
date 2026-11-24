@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">স্মার্ট তাসবিহ</string>
+    <string name="app_name">রুহু তাসবিহ</string>
     <string name="app_subtitle">ডিজিটাল জিকির কাউন্টার</string>
 
     <!-- Navigation -->
@@ -106,7 +106,7 @@
     <string name="clear_history">ইতিহাস ক্লিয়ার করুন</string>
     <string name="reset_app_data">অ্যাপ্লিকেশন রিসেট করুন</string>
 
-    <string name="sec_about">স্মার্ট তাসবিহ সম্পর্কে</string>
+    <string name="sec_about">রুহু তাসবিহ সম্পর্কে</string>
     <string name="version_label">ভার্সন ১.০.০ (অফলাইন ফার্স্ট)</string>
     <string name="developer_info">আন্তরিক ভালোবাসায় নির্মিত</string>
     <string name="privacy_policy">গোপনীয়তা নীতি: ১০০% লোকাল স্টোরেজ, কোনো ক্লাউড সিঙ্ক বা ডাটা সংগ্রহ করা হয় না।</string>

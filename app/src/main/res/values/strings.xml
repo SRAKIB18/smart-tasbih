@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Smart Tasbih</string>
+    <string name="app_name">Ruhu Tasbih</string>
     <string name="app_subtitle">Digital Dhikr Counter</string>
 
     <!-- Navigation -->
@@ -106,7 +106,7 @@
     <string name="clear_history">Clear History Logs</string>
     <string name="reset_app_data">Reset Application</string>
 
-    <string name="sec_about">About Smart Tasbih</string>
+    <string name="sec_about">About Ruhu Tasbih</string>
     <string name="version_label">Version 1.0.0 (Offline First)</string>
     <string name="developer_info">Built with Love &amp; Devotion</string>
     <string name="privacy_policy">Privacy First: 100% Local Storage, No Cloud Sync or Data Collection.</string>

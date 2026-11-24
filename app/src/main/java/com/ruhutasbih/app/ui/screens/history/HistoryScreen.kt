@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -376,21 +377,21 @@ fun HistoryScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
 
                             if (isCurveChartStyle) {
                                 ProfessionalCurveAreaChart(
                                     data = uiState.chartData,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(220.dp)
+                                        .height(230.dp)
                                 )
                             } else {
                                 ProfessionalBarChart(
                                     data = uiState.chartData,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(220.dp)
+                                        .height(230.dp)
                                 )
                             }
                         }
@@ -558,55 +559,10 @@ private fun ProfessionalCurveAreaChart(
     }
 
     Column(modifier = modifier) {
-        // Prominent High-Visibility Inspect Tooltip Badge
-        if (selectedIndex != null && selectedIndex!! in data.indices) {
-            val selectedItem = data[selectedIndex!!]
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shadowElevation = 4.dp
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Selected",
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.height(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "${selectedItem.first}: ${selectedItem.second} counts",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
-                            )
-                        )
-                    }
-
-                    Text(
-                        text = "✕",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.clickable { selectedIndex = null }
-                    )
-                }
-            }
-        }
-
         Canvas(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
+                .fillMaxWidth()
                 .pointerInput(data) {
                     detectTapGestures { offset ->
                         if (data.isEmpty()) return@detectTapGestures
@@ -628,8 +584,8 @@ private fun ProfessionalCurveAreaChart(
             val maxVal = maxOf(1L, data.maxOf { it.second })
             val count = data.size
             val availableWidth = size.width
-            val topPadding = 45.dp.toPx()
-            val bottomPadding = 36.dp.toPx()
+            val topPadding = 35.dp.toPx()
+            val bottomPadding = 32.dp.toPx()
             val usableHeight = size.height - topPadding - bottomPadding
 
             // Horizontal reference grid lines
@@ -745,6 +701,54 @@ private fun ProfessionalCurveAreaChart(
                 )
             }
         }
+
+        // Sleek Compact Bottom Inspect Info Badge
+        if (selectedIndex != null && selectedIndex!! in data.indices) {
+            val selectedItem = data[selectedIndex!!]
+            Spacer(modifier = Modifier.height(6.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Selected",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "${selectedItem.first}: ${selectedItem.second} counts",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp
+                            )
+                        )
+                    }
+
+                    Text(
+                        text = "✕",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        ),
+                        modifier = Modifier.clickable { selectedIndex = null }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -783,55 +787,10 @@ private fun ProfessionalBarChart(
     }
 
     Column(modifier = modifier) {
-        // Prominent High-Visibility Inspect Tooltip Badge
-        if (selectedIndex != null && selectedIndex!! in data.indices) {
-            val selectedItem = data[selectedIndex!!]
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp),
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shadowElevation = 4.dp
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Selected",
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.height(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "${selectedItem.first}: ${selectedItem.second} counts",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
-                            )
-                        )
-                    }
-
-                    Text(
-                        text = "✕",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.clickable { selectedIndex = null }
-                    )
-                }
-            }
-        }
-
         Canvas(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
+                .fillMaxWidth()
                 .pointerInput(data) {
                     detectTapGestures { offset ->
                         if (data.isEmpty()) return@detectTapGestures
@@ -855,8 +814,8 @@ private fun ProfessionalBarChart(
             val maxVal = maxOf(1L, data.maxOf { it.second })
             val count = data.size
             val availableWidth = size.width
-            val topPadding = 40.dp.toPx()
-            val bottomPadding = 36.dp.toPx()
+            val topPadding = 35.dp.toPx()
+            val bottomPadding = 32.dp.toPx()
             val usableHeight = size.height - topPadding - bottomPadding
 
             val barSpacing = availableWidth / (count * 2f + 1f)
@@ -953,6 +912,54 @@ private fun ProfessionalBarChart(
                     size.height - 6.dp.toPx(),
                     if (isSelected) goldPaint else textPaint
                 )
+            }
+        }
+
+        // Sleek Compact Bottom Inspect Info Badge
+        if (selectedIndex != null && selectedIndex!! in data.indices) {
+            val selectedItem = data[selectedIndex!!]
+            Spacer(modifier = Modifier.height(6.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Selected",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "${selectedItem.first}: ${selectedItem.second} counts",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp
+                            )
+                        )
+                    }
+
+                    Text(
+                        text = "✕",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        ),
+                        modifier = Modifier.clickable { selectedIndex = null }
+                    )
+                }
             }
         }
     }

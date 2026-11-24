@@ -18,16 +18,17 @@ class HapticManager(context: Context) {
 
     fun vibrateClick() {
         try {
-            if (vibrator?.hasVibrator() == true) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+            if (vibrator != null && vibrator.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val effect = VibrationEffect.createOneShot(50L, VibrationEffect.DEFAULT_AMPLITUDE)
+                    vibrator.vibrate(effect)
                 } else {
                     @Suppress("DEPRECATION")
-                    vibrator.vibrate(25L)
+                    vibrator.vibrate(50L)
                 }
             }
         } catch (e: Exception) {
-            // Ignore if vibration fails
+            e.printStackTrace()
         }
     }
 }
