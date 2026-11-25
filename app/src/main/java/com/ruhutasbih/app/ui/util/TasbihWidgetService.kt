@@ -2,6 +2,7 @@ package com.ruhutasbih.app.ui.util
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.ruhutasbih.app.R
@@ -18,10 +19,16 @@ class TasbihWidgetService : RemoteViewsService() {
 class TasbihWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
 
     private var tasbihList: List<TasbihEntity> = emptyList()
+    private var itemBgBitmap: Bitmap? = null
 
-    override fun onCreate() {}
+    override fun onCreate() {
+        itemBgBitmap = WidgetBitmapUtil.loadDownsampledBitmap(context, R.drawable.widget_item_islamic_bg, 350, 70)
+    }
 
     override fun onDataSetChanged() {
+        if (itemBgBitmap == null) {
+            itemBgBitmap = WidgetBitmapUtil.loadDownsampledBitmap(context, R.drawable.widget_item_islamic_bg, 350, 70)
+        }
         try {
             runBlocking {
                 val db = AppDatabase.getDatabase(context)
@@ -37,6 +44,7 @@ class TasbihWidgetFactory(private val context: Context) : RemoteViewsService.Rem
 
     override fun onDestroy() {
         tasbihList = emptyList()
+        itemBgBitmap = null
     }
 
     override fun getCount(): Int = tasbihList.size
@@ -46,6 +54,13 @@ class TasbihWidgetFactory(private val context: Context) : RemoteViewsService.Rem
         val item = tasbihList[position]
 
         val views = RemoteViews(context.packageName, R.layout.tasbih_widget_item)
+
+        if (itemBgBitmap != null) {
+            views.setImageViewBitmap(R.id.widget_item_bg_image, itemBgBitmap)
+        } else {
+            views.setImageViewResource(R.id.widget_item_bg_image, R.drawable.widget_bg_vector)
+        }
+
         views.setTextViewText(R.id.widget_item_name, item.name)
         views.setTextViewText(
             R.id.widget_item_meaning,
