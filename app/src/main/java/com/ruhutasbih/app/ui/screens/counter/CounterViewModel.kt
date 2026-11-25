@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -26,17 +27,32 @@ class CounterViewModel(
         initialValue = UserPreferences()
     )
 
+    val soundEnabled: StateFlow<Boolean> = userPreferences
+        .map { it.soundEnabled }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
+    val vibrationEnabled: StateFlow<Boolean> = userPreferences
+        .map { it.vibrationEnabled }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
+    val keepScreenAwake: StateFlow<Boolean> = userPreferences
+        .map { it.keepScreenAwake }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
     private val _tasbih = MutableStateFlow<TasbihEntity?>(null)
     val tasbih: StateFlow<TasbihEntity?> = _tasbih.asStateFlow()
-
-    private val _soundEnabled = MutableStateFlow(true)
-    val soundEnabled: StateFlow<Boolean> = _soundEnabled.asStateFlow()
-
-    private val _vibrationEnabled = MutableStateFlow(true)
-    val vibrationEnabled: StateFlow<Boolean> = _vibrationEnabled.asStateFlow()
-
-    private val _keepScreenAwake = MutableStateFlow(false)
-    val keepScreenAwake: StateFlow<Boolean> = _keepScreenAwake.asStateFlow()
 
     private val _isFullScreen = MutableStateFlow(false)
     val isFullScreen: StateFlow<Boolean> = _isFullScreen.asStateFlow()
@@ -71,15 +87,21 @@ class CounterViewModel(
     }
 
     fun toggleSound() {
-        _soundEnabled.value = !_soundEnabled.value
+        viewModelScope.launch {
+            preferencesRepository.setSoundEnabled(!userPreferences.value.soundEnabled)
+        }
     }
 
     fun toggleVibration() {
-        _vibrationEnabled.value = !_vibrationEnabled.value
+        viewModelScope.launch {
+            preferencesRepository.setVibrationEnabled(!userPreferences.value.vibrationEnabled)
+        }
     }
 
     fun toggleKeepScreenAwake() {
-        _keepScreenAwake.value = !_keepScreenAwake.value
+        viewModelScope.launch {
+            preferencesRepository.setKeepScreenAwake(!userPreferences.value.keepScreenAwake)
+        }
     }
 
     fun toggleFullScreen() {
