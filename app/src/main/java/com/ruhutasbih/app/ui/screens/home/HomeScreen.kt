@@ -63,6 +63,7 @@ import com.ruhutasbih.app.ui.components.AddEditTasbihDialog
 import com.ruhutasbih.app.ui.components.StatCard
 import com.ruhutasbih.app.ui.components.TasbihCard
 import com.ruhutasbih.app.ui.theme.ArabicGoldText
+import com.ruhutasbih.app.ui.theme.PendingBadgeOrange
 import com.ruhutasbih.app.ui.util.AudioReciter
 import java.text.SimpleDateFormat
 import java.util.Date

@@ -3,13 +3,17 @@ package com.ruhutasbih.app.ui.screens.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.ruhutasbih.app.domain.engine.AchievementBadge
 import com.ruhutasbih.app.domain.engine.DateRolloverEngine
+import com.ruhutasbih.app.domain.engine.StreakEngine
+import com.ruhutasbih.app.domain.engine.StreakResult
 import com.ruhutasbih.app.domain.repository.HistoryRepository
 import com.ruhutasbih.app.domain.repository.TasbihRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -223,6 +227,26 @@ class HistoryViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = HistoryUiState()
     )
+
+    val streakResult: StateFlow<StreakResult> = combine(
+        historyRepository.getAllProgressFlow(),
+        tasbihRepository.getAllTasbihs()
+    ) { allProgress, allTasbihs ->
+        val totalLifetime = allTasbihs.sumOf { it.lifetimeCount }
+        StreakEngine.calculateStreak(allProgress, totalLifetime)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = StreakResult()
+    )
+
+    val badges: StateFlow<List<AchievementBadge>> = streakResult
+        .map { result -> StreakEngine.getBadges(result) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     fun onTabSelected(tabIndex: Int) {
         _selectedTab.value = tabIndex

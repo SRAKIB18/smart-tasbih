@@ -4,11 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ruhutasbih.app.data.local.entity.TasbihEntity
+import com.ruhutasbih.app.domain.engine.StreakEngine
+import com.ruhutasbih.app.domain.engine.StreakResult
 import com.ruhutasbih.app.domain.repository.TasbihRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -84,6 +87,22 @@ class HomeViewModel(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = HomeUiState()
+    )
+
+    val streakResult: StateFlow<StreakResult> = repository.getAllTasbihs().map { tasbihs ->
+        val active = tasbihs.filter { !it.isArchived }
+        val completedCount = active.count { it.todayReading >= it.dailyTarget }
+        val streak = if (completedCount > 0) 1 else 0
+        StreakResult(
+            currentStreak = streak,
+            bestStreak = streak,
+            totalCompletedDays = streak,
+            totalLifetimeCount = active.sumOf { it.lifetimeCount }
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = StreakResult()
     )
 
     fun onSearchQueryChanged(query: String) {
