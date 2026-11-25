@@ -9,17 +9,23 @@ class SoundManager(context: Context) {
 
     init {
         try {
-            toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 80)
+            toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 85)
         } catch (e: Exception) {
             toneGenerator = null
         }
     }
 
-    fun playClickSound() {
+    fun playClickSound(soundType: String = "BEEP") {
         try {
-            toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, 30)
+            val tone = when (soundType) {
+                "WOOD_CLICK" -> ToneGenerator.TONE_PROP_ACK
+                "METALLIC_TINK" -> ToneGenerator.TONE_PROP_PROMPT
+                "SOFT_TICK" -> ToneGenerator.TONE_DTMF_1
+                else -> ToneGenerator.TONE_PROP_BEEP // "BEEP"
+            }
+            toneGenerator?.startTone(tone, 30)
         } catch (e: Exception) {
-            // Ignore if audio hardware unavailable
+            // Safe ignore if audio hardware unavailable
         }
     }
 

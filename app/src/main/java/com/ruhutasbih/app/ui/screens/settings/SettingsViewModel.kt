@@ -43,6 +43,12 @@ class SettingsViewModel(
         }
     }
 
+    fun setClickSoundType(soundType: String) {
+        viewModelScope.launch {
+            preferencesRepository.setClickSoundType(soundType)
+        }
+    }
+
     fun setVibrationEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setVibrationEnabled(enabled)

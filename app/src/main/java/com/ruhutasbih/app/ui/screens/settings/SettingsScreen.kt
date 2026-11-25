@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,6 +55,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import com.ruhutasbih.app.R
 import com.ruhutasbih.app.ui.components.DeveloperInfoDialog
 import com.ruhutasbih.app.ui.util.NotificationHelper
+import com.ruhutasbih.app.ui.util.SoundManager
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -85,6 +89,13 @@ fun SettingsScreen(
     var showClearHistoryDialog by remember { mutableStateOf(false) }
     var showDeveloperModal by remember { mutableStateOf(false) }
     var showTimePickerModal by remember { mutableStateOf(false) }
+
+    val soundManager = remember { SoundManager(context) }
+    DisposableEffect(Unit) {
+        onDispose {
+            soundManager.release()
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -228,6 +239,51 @@ fun SettingsScreen(
                                 checked = prefs.soundEnabled,
                                 onCheckedChange = { viewModel.setSoundEnabled(it) }
                             )
+                        }
+
+                        if (prefs.soundEnabled) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(R.string.click_sound_type),
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            val soundTypes = listOf("BEEP", "WOOD_CLICK", "METALLIC_TINK", "SOFT_TICK")
+                            val soundLabels = listOf(
+                                stringResource(R.string.sound_beep),
+                                stringResource(R.string.sound_wood),
+                                stringResource(R.string.sound_metallic),
+                                stringResource(R.string.sound_soft)
+                            )
+                            LazyRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                itemsIndexed(soundTypes) { idx, typeKey ->
+                                    val isSelected = prefs.clickSoundType == typeKey
+                                    AssistChip(
+                                        onClick = {
+                                            viewModel.setClickSoundType(typeKey)
+                                            soundManager.playClickSound(typeKey)
+                                        },
+                                        label = {
+                                            Text(
+                                                text = soundLabels[idx],
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                            )
+                                        },
+                                        border = AssistChipDefaults.assistChipBorder(
+                                            enabled = true,
+                                            borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                                        )
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
 
                         Row(

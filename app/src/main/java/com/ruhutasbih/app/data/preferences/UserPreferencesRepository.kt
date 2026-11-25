@@ -27,7 +27,8 @@ data class UserPreferences(
     val dailyReminderEnabled: Boolean = false,
     val dailyReminderTime: String = "20:00",
     val reminderTimes: Set<String> = setOf("05:30", "18:00", "21:00"),
-    val counterSkin: String = "DIGITAL_LED" // "DIGITAL_LED", "WOODEN_BEADS", "CRYSTAL_BEADS", "METALLIC_RING"
+    val counterSkin: String = "DIGITAL_LED", // "DIGITAL_LED", "WOODEN_BEADS", "CRYSTAL_BEADS", "METALLIC_RING", etc.
+    val clickSoundType: String = "BEEP" // "BEEP", "WOOD_CLICK", "METALLIC_TINK", "SOFT_TICK"
 )
 
 class UserPreferencesRepository(context: Context) {
@@ -45,6 +46,7 @@ class UserPreferencesRepository(context: Context) {
         val DAILY_REMINDER_TIME = stringPreferencesKey("daily_reminder_time")
         val REMINDER_TIMES = stringSetPreferencesKey("reminder_times")
         val COUNTER_SKIN = stringPreferencesKey("counter_skin")
+        val CLICK_SOUND_TYPE = stringPreferencesKey("click_sound_type")
     }
 
     val userPreferencesFlow: Flow<UserPreferences> = appContext.dataStore.data
@@ -66,7 +68,8 @@ class UserPreferencesRepository(context: Context) {
                 dailyReminderEnabled = preferences[PreferencesKeys.DAILY_REMINDER_ENABLED] ?: false,
                 dailyReminderTime = preferences[PreferencesKeys.DAILY_REMINDER_TIME] ?: "20:00",
                 reminderTimes = preferences[PreferencesKeys.REMINDER_TIMES] ?: setOf("05:30", "18:00", "21:00"),
-                counterSkin = preferences[PreferencesKeys.COUNTER_SKIN] ?: "DIGITAL_LED"
+                counterSkin = preferences[PreferencesKeys.COUNTER_SKIN] ?: "DIGITAL_LED",
+                clickSoundType = preferences[PreferencesKeys.CLICK_SOUND_TYPE] ?: "BEEP"
             )
         }
 
@@ -135,6 +138,12 @@ class UserPreferencesRepository(context: Context) {
     suspend fun setCounterSkin(skin: String) {
         appContext.dataStore.edit { preferences ->
             preferences[PreferencesKeys.COUNTER_SKIN] = skin
+        }
+    }
+
+    suspend fun setClickSoundType(soundType: String) {
+        appContext.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.CLICK_SOUND_TYPE] = soundType
         }
     }
 }

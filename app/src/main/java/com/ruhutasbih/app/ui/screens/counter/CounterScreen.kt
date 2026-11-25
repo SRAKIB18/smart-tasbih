@@ -70,6 +70,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -151,7 +152,101 @@ fun CounterScreen(
         label = "CounterProgress"
     )
 
-    val currentSkin = userPrefs.counterSkin
+    val currentSkinKey = userPrefs.counterSkin
+
+    val skinConfig = when (currentSkinKey) {
+        "WOODEN_BEADS" -> SkinConfig(
+            key = "WOODEN_BEADS",
+            name = stringResource(R.string.skin_wooden_beads),
+            iconStr = "🪵",
+            trackColor = Color(0xFF3E2723),
+            arcStartColor = Color(0xFFFFB300),
+            arcEndColor = Color(0xFFFF8F00),
+            innerSurfaceColor = Color(0xFF2C1802),
+            numberTextColor = Color(0xFFFFD54F),
+            subtitleColor = Color(0xFFFFB300),
+            auraGlowColor = Color(0xFFFFB300).copy(alpha = 0.25f),
+            drawBeads = true
+        )
+        "CRYSTAL_BEADS" -> SkinConfig(
+            key = "CRYSTAL_BEADS",
+            name = stringResource(R.string.skin_crystal_beads),
+            iconStr = "💎",
+            trackColor = Color(0xFF004D40),
+            arcStartColor = Color(0xFF00E5FF),
+            arcEndColor = Color(0xFF1DE9B6),
+            innerSurfaceColor = Color(0xFF00251A),
+            numberTextColor = Color(0xFF1DE9B6),
+            subtitleColor = Color(0xFF00E5FF),
+            auraGlowColor = Color(0xFF1DE9B6).copy(alpha = 0.25f),
+            drawBeads = true
+        )
+        "METALLIC_RING" -> SkinConfig(
+            key = "METALLIC_RING",
+            name = stringResource(R.string.skin_metallic_ring),
+            iconStr = "⚙️",
+            trackColor = Color(0xFF1A232A),
+            arcStartColor = Color(0xFFFFD700),
+            arcEndColor = Color(0xFFFFA000),
+            innerSurfaceColor = Color(0xFF102A43),
+            numberTextColor = Color(0xFFFFE082),
+            subtitleColor = Color(0xFFFFD700),
+            auraGlowColor = Color(0xFFFFD700).copy(alpha = 0.25f),
+            drawBeads = true
+        )
+        "ISLAMIC_GOLD" -> SkinConfig(
+            key = "ISLAMIC_GOLD",
+            name = stringResource(R.string.skin_islamic_gold),
+            iconStr = "🕌",
+            trackColor = Color(0xFF0F172A),
+            arcStartColor = Color(0xFFFFD700),
+            arcEndColor = Color(0xFFFFB300),
+            innerSurfaceColor = Color(0xFF1E1B4B),
+            numberTextColor = Color(0xFFFFF176),
+            subtitleColor = Color(0xFFFFD700),
+            auraGlowColor = Color(0xFFFFD700).copy(alpha = 0.30f),
+            drawBeads = true
+        )
+        "COSMIC_GALAXY" -> SkinConfig(
+            key = "COSMIC_GALAXY",
+            name = stringResource(R.string.skin_cosmic_galaxy),
+            iconStr = "🌌",
+            trackColor = Color(0xFF180E29),
+            arcStartColor = Color(0xFFA855F7),
+            arcEndColor = Color(0xFF38BDF8),
+            innerSurfaceColor = Color(0xFF0B071A),
+            numberTextColor = Color(0xFFE9D5FF),
+            subtitleColor = Color(0xFFC084FC),
+            auraGlowColor = Color(0xFFA855F7).copy(alpha = 0.25f),
+            drawBeads = true
+        )
+        "NATURAL_JADE" -> SkinConfig(
+            key = "NATURAL_JADE",
+            name = stringResource(R.string.skin_natural_jade),
+            iconStr = "🌿",
+            trackColor = Color(0xFF064E3B),
+            arcStartColor = Color(0xFF10B981),
+            arcEndColor = Color(0xFF34D399),
+            innerSurfaceColor = Color(0xFF022C22),
+            numberTextColor = Color(0xFFA7F3D0),
+            subtitleColor = Color(0xFF34D399),
+            auraGlowColor = Color(0xFF34D399).copy(alpha = 0.25f),
+            drawBeads = true
+        )
+        else -> SkinConfig( // DIGITAL_LED
+            key = "DIGITAL_LED",
+            name = stringResource(R.string.skin_digital_led),
+            iconStr = "⚡",
+            trackColor = Color(0xFF1E293B),
+            arcStartColor = if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.primary,
+            arcEndColor = if (isTargetReached) TargetProgressGreen else Color(0xFF00E5FF),
+            innerSurfaceColor = MaterialTheme.colorScheme.surface,
+            numberTextColor = if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.onSurface,
+            subtitleColor = if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.primary,
+            auraGlowColor = (if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.primary).copy(alpha = 0.2f),
+            drawBeads = false
+        )
+    }
 
     Scaffold(
         modifier = modifier,
@@ -178,6 +273,7 @@ fun CounterScreen(
                         }
                     },
                     actions = {
+                        // 1. Lock Counter Button
                         IconButton(onClick = {
                             viewModel.toggleLock()
                             val msg = if (!isLocked) "কাউন্টার লক করা হয়েছে" else "কাউন্টার আনলক করা হয়েছে"
@@ -190,6 +286,7 @@ fun CounterScreen(
                             )
                         }
 
+                        // 2. Select Skin Button
                         IconButton(onClick = { showSkinDialog = true }) {
                             Icon(
                                 imageVector = Icons.Default.Palette,
@@ -198,6 +295,7 @@ fun CounterScreen(
                             )
                         }
 
+                        // 3. Overflow Menu
                         Box {
                             IconButton(onClick = { actionsMenuExpanded = true }) {
                                 Icon(
@@ -462,34 +560,6 @@ fun CounterScreen(
                 }
             }
 
-            // Dynamic Tasbih Counter Skin Customization Styling
-            val (trackColor, activeColor, innerSurfaceColor, textColor) = when (currentSkin) {
-                "WOODEN_BEADS" -> Tuple4(
-                    Color(0xFF4A2C11),
-                    Color(0xFFFFB300),
-                    Color(0xFF2C1802),
-                    Color(0xFFFFD54F)
-                )
-                "CRYSTAL_BEADS" -> Tuple4(
-                    Color(0xFF004D40),
-                    Color(0xFF00E5FF),
-                    Color(0xFF00251A),
-                    Color(0xFF1DE9B6)
-                )
-                "METALLIC_RING" -> Tuple4(
-                    Color(0xFF263238),
-                    Color(0xFFFFD700),
-                    Color(0xFF102A43),
-                    Color(0xFFFFE082)
-                )
-                else -> Tuple4( // DIGITAL_LED
-                    MaterialTheme.colorScheme.surfaceVariant,
-                    if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.primary,
-                    MaterialTheme.colorScheme.surface,
-                    if (isTargetReached) TargetProgressGreen else MaterialTheme.colorScheme.onSurface
-                )
-            }
-
             // Central Animated Circular Counter Button
             val interactionSource = remember { MutableInteractionSource() }
             val isPressed by interactionSource.collectIsPressedAsState()
@@ -514,34 +584,45 @@ fun CounterScreen(
                         if (isLocked) {
                             Toast.makeText(context, "গণনা করতে প্যাডলক আইকনে ট্যাপ করে আনলক করুন", Toast.LENGTH_SHORT).show()
                         } else {
-                            if (soundEnabled) soundManager.playClickSound()
+                            if (soundEnabled) soundManager.playClickSound(userPrefs.clickSoundType)
                             if (vibrationEnabled) hapticManager.vibrateClick()
                             viewModel.incrementCount(1L)
                         }
                     }
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
-                    val strokeWidth = 18.dp.toPx()
+                    val strokeWidth = 20.dp.toPx()
                     val radius = (size.minDimension - strokeWidth) / 2f
                     val center = Offset(size.width / 2f, size.height / 2f)
 
+                    // Draw Outer Aura Glow
+                    drawCircle(
+                        color = skinConfig.auraGlowColor,
+                        radius = radius + (strokeWidth / 1.5f),
+                        center = center
+                    )
+
                     // Draw Base Track Ring
                     drawCircle(
-                        color = trackColor,
+                        color = skinConfig.trackColor,
                         style = Stroke(width = strokeWidth)
                     )
 
-                    // Draw Progress Arc
+                    // Draw Gradient Progress Arc
+                    val arcBrush = Brush.sweepGradient(
+                        colors = listOf(skinConfig.arcStartColor, skinConfig.arcEndColor, skinConfig.arcStartColor),
+                        center = center
+                    )
                     drawArc(
-                        color = activeColor,
+                        brush = arcBrush,
                         startAngle = -90f,
                         sweepAngle = animatedProgress * 360f,
                         useCenter = false,
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
 
-                    // Draw 33 Bead Ticks for Physical Bead feel if not digital
-                    if (currentSkin != "DIGITAL_LED") {
+                    // Draw 33 Traditional Bead Ticks for Physical Bead feel
+                    if (skinConfig.drawBeads) {
                         val beadCount = 33
                         for (i in 0 until beadCount) {
                             val angleRad = Math.toRadians((i * (360.0 / beadCount)) - 90.0)
@@ -549,11 +630,13 @@ fun CounterScreen(
                             val by = center.y + radius * sin(angleRad).toFloat()
 
                             val isPassedBead = (i.toFloat() / beadCount.toFloat()) <= animatedProgress
-                            val beadColor = if (isPassedBead) activeColor else trackColor.copy(alpha = 0.5f)
+                            val isSeparatorBead = (i + 1) % 11 == 0
+                            val beadRadius = if (isSeparatorBead) 6.dp.toPx() else 4.dp.toPx()
+                            val beadColor = if (isPassedBead) skinConfig.arcStartColor else skinConfig.trackColor.copy(alpha = 0.6f)
 
                             drawCircle(
                                 color = beadColor,
-                                radius = 4.dp.toPx(),
+                                radius = beadRadius,
                                 center = Offset(bx, by)
                             )
                         }
@@ -562,9 +645,10 @@ fun CounterScreen(
 
                 Surface(
                     shape = CircleShape,
-                    color = if (isLocked) innerSurfaceColor.copy(alpha = 0.85f) else innerSurfaceColor,
-                    shadowElevation = 8.dp,
-                    modifier = Modifier.size(230.dp)
+                    color = if (isLocked) skinConfig.innerSurfaceColor.copy(alpha = 0.85f) else skinConfig.innerSurfaceColor,
+                    border = BorderStroke(2.dp, skinConfig.arcStartColor.copy(alpha = 0.35f)),
+                    shadowElevation = 10.dp,
+                    modifier = Modifier.size(225.dp)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center,
@@ -578,15 +662,15 @@ fun CounterScreen(
                                 text = currentTasbih.todayReading.toString(),
                                 style = MaterialTheme.typography.displayLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 54.sp,
-                                    color = if (isLocked) textColor.copy(alpha = 0.5f) else textColor
+                                    fontSize = 56.sp,
+                                    color = if (isLocked) skinConfig.numberTextColor.copy(alpha = 0.5f) else skinConfig.numberTextColor
                                 )
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = if (isLocked) stringResource(R.string.counter_locked) else stringResource(R.string.tap_to_count),
                                 style = MaterialTheme.typography.labelLarge.copy(
-                                    color = if (isLocked) MaterialTheme.colorScheme.error else textColor,
+                                    color = if (isLocked) MaterialTheme.colorScheme.error else skinConfig.subtitleColor,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
@@ -744,39 +828,73 @@ fun CounterScreen(
                 )
             },
             text = {
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     val skins = listOf(
-                        "DIGITAL_LED" to stringResource(R.string.skin_digital_led),
-                        "WOODEN_BEADS" to stringResource(R.string.skin_wooden_beads),
-                        "CRYSTAL_BEADS" to stringResource(R.string.skin_crystal_beads),
-                        "METALLIC_RING" to stringResource(R.string.skin_metallic_ring)
+                        SkinConfig("DIGITAL_LED", stringResource(R.string.skin_digital_led), "⚡", Color(0xFF1E293B), Color(0xFF00E5FF), Color(0xFF10B981), Color(0xFF0F172A), Color(0xFF00E5FF), Color(0xFF10B981), Color.Unspecified, false),
+                        SkinConfig("WOODEN_BEADS", stringResource(R.string.skin_wooden_beads), "🪵", Color(0xFF3E2723), Color(0xFFFFB300), Color(0xFFFF8F00), Color(0xFF2C1802), Color(0xFFFFD54F), Color(0xFFFFB300), Color.Unspecified, true),
+                        SkinConfig("CRYSTAL_BEADS", stringResource(R.string.skin_crystal_beads), "💎", Color(0xFF004D40), Color(0xFF00E5FF), Color(0xFF1DE9B6), Color(0xFF00251A), Color(0xFF1DE9B6), Color(0xFF00E5FF), Color.Unspecified, true),
+                        SkinConfig("METALLIC_RING", stringResource(R.string.skin_metallic_ring), "⚙️", Color(0xFF1A232A), Color(0xFFFFD700), Color(0xFFFFA000), Color(0xFF102A43), Color(0xFFFFE082), Color(0xFFFFD700), Color.Unspecified, true),
+                        SkinConfig("ISLAMIC_GOLD", stringResource(R.string.skin_islamic_gold), "🕌", Color(0xFF0F172A), Color(0xFFFFD700), Color(0xFFFFB300), Color(0xFF1E1B4B), Color(0xFFFFF176), Color(0xFFFFD700), Color.Unspecified, true),
+                        SkinConfig("COSMIC_GALAXY", stringResource(R.string.skin_cosmic_galaxy), "🌌", Color(0xFF180E29), Color(0xFFA855F7), Color(0xFF38BDF8), Color(0xFF0B071A), Color(0xFFE9D5FF), Color(0xFFC084FC), Color.Unspecified, true),
+                        SkinConfig("NATURAL_JADE", stringResource(R.string.skin_natural_jade), "🌿", Color(0xFF064E3B), Color(0xFF10B981), Color(0xFF34D399), Color(0xFF022C22), Color(0xFFA7F3D0), Color(0xFF34D399), Color.Unspecified, true)
                     )
 
-                    skins.forEach { (skinKey, label) ->
-                        Row(
+                    skins.forEach { item ->
+                        val isSelected = currentSkinKey == item.key
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    viewModel.setCounterSkin(skinKey)
+                                    viewModel.setCounterSkin(item.key)
                                     showSkinDialog = false
-                                }
-                                .padding(vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                },
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            border = BorderStroke(
+                                width = if (isSelected) 2.dp else 1.dp,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                            )
                         ) {
-                            RadioButton(
-                                selected = currentSkin == skinKey,
-                                onClick = {
-                                    viewModel.setCounterSkin(skinKey)
-                                    showSkinDialog = false
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = item.iconStr,
+                                        fontSize = 22.sp
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = item.name,
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    )
                                 }
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                text = label,
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = if (currentSkin == skinKey) FontWeight.Bold else FontWeight.Normal
+
+                                RadioButton(
+                                    selected = isSelected,
+                                    onClick = {
+                                        viewModel.setCounterSkin(item.key)
+                                        showSkinDialog = false
+                                    }
                                 )
-                            )
+                            }
                         }
                     }
                 }
@@ -813,11 +931,18 @@ fun CounterScreen(
     }
 }
 
-private data class Tuple4<A, B, C, D>(
-    val first: A,
-    val second: B,
-    val third: C,
-    val fourth: D
+private data class SkinConfig(
+    val key: String,
+    val name: String,
+    val iconStr: String,
+    val trackColor: Color,
+    val arcStartColor: Color,
+    val arcEndColor: Color,
+    val innerSurfaceColor: Color,
+    val numberTextColor: Color,
+    val subtitleColor: Color,
+    val auraGlowColor: Color,
+    val drawBeads: Boolean
 )
 
 @Composable
