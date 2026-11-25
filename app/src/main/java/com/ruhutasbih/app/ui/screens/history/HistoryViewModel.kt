@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 data class HistoryItemUiModel(
@@ -61,31 +60,23 @@ private data class SelectionState(
 )
 
 class HistoryViewModel(
-    private val historyRepository: HistoryRepository,
-    private val tasbihRepository: TasbihRepository
+    historyRepository: HistoryRepository,
+    tasbihRepository: TasbihRepository
 ) : ViewModel() {
 
     private val _selectedTab = MutableStateFlow(0)
-    val selectedTab: StateFlow<Int> = _selectedTab
-
     private val _selectedDailyDate = MutableStateFlow(DateRolloverEngine.getTodayDateString())
-    val selectedDailyDate: StateFlow<String> = _selectedDailyDate
-
     private val currentCal = Calendar.getInstance()
     private val _selectedMonthlyYear = MutableStateFlow(currentCal.get(Calendar.YEAR))
     private val _selectedMonthlyMonth = MutableStateFlow(currentCal.get(Calendar.MONTH) + 1)
     private val _selectedYearlyYear = MutableStateFlow(currentCal.get(Calendar.YEAR))
-
-    private val _historySearchQuery = MutableStateFlow("")
-    val historySearchQuery: StateFlow<String> = _historySearchQuery
 
     private val selectionsFlow = combine(
         _selectedTab,
         _selectedDailyDate,
         _selectedMonthlyYear,
         _selectedMonthlyMonth,
-        _selectedYearlyYear,
-        _historySearchQuery
+        _selectedYearlyYear
     ) { args: Array<Any> ->
         SelectionState(
             tab = args[0] as Int,
@@ -93,7 +84,7 @@ class HistoryViewModel(
             mYear = args[2] as Int,
             mMonth = args[3] as Int,
             yYear = args[4] as Int,
-            query = args[5] as String
+            query = ""
         )
     }
 
@@ -126,8 +117,8 @@ class HistoryViewModel(
 
         // Generate available years: Default range (past 5 years to current year + 1) + dataset years
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-        val defaultYears = (currentYear - 5..currentYear + 1).toSet()
-        val datasetYears = allProgress.mapNotNull {
+        val defaultYears = ((currentYear - 5)..(currentYear + 1)).toSet()
+        val datasetYears = allProgress.asSequence().mapNotNull {
             it.date.take(4).toIntOrNull()
         }.toSet()
         val sortedYears = (defaultYears + datasetYears).sortedDescending()
@@ -265,9 +256,6 @@ class HistoryViewModel(
         _selectedYearlyYear.value = year
     }
 
-    fun onHistorySearchQueryChanged(query: String) {
-        _historySearchQuery.value = query
-    }
 
     fun selectPreviousDay() {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
@@ -276,7 +264,7 @@ class HistoryViewModel(
             val cal = Calendar.getInstance().apply { time = date }
             cal.add(Calendar.DAY_OF_YEAR, -1)
             _selectedDailyDate.value = sdf.format(cal.time)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Safe fallback
         }
     }
@@ -288,7 +276,7 @@ class HistoryViewModel(
             val cal = Calendar.getInstance().apply { time = date }
             cal.add(Calendar.DAY_OF_YEAR, 1)
             _selectedDailyDate.value = sdf.format(cal.time)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Safe fallback
         }
     }
@@ -297,7 +285,7 @@ class HistoryViewModel(
         _selectedDailyDate.value = DateRolloverEngine.getTodayDateString()
     }
 
-    private fun getPastDatesFrom(startDateStr: String, count: Int): List<String> {
+    private fun getPastDatesFrom(startDateStr: String, count: Int = 7): List<String> {
         val list = mutableListOf<String>()
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         val cal = Calendar.getInstance()
@@ -306,11 +294,11 @@ class HistoryViewModel(
             if (startDate != null) {
                 cal.time = startDate
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Use current date
         }
 
-        for (i in 0 until count) {
+        repeat(count) {
             list.add(sdf.format(cal.time))
             cal.add(Calendar.DAY_OF_YEAR, -1)
         }
@@ -323,7 +311,7 @@ class HistoryViewModel(
             val outputSdf = SimpleDateFormat("dd/MM", Locale.US)
             val date = inputSdf.parse(dateStr)
             date?.let { outputSdf.format(it) } ?: dateStr.takeLast(5)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             dateStr.takeLast(5)
         }
     }

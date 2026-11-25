@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class CounterViewModel(
     private val tasbihId: String,
     private val repository: TasbihRepository,
-    private val preferencesRepository: UserPreferencesRepository
+    private val preferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
     val userPreferences: StateFlow<UserPreferences> = preferencesRepository.userPreferencesFlow.stateIn(
@@ -121,7 +121,7 @@ class CounterViewModel(
     class Factory(
         private val tasbihId: String,
         private val repository: TasbihRepository,
-        private val preferencesRepository: UserPreferencesRepository
+        private val preferencesRepository: UserPreferencesRepository,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

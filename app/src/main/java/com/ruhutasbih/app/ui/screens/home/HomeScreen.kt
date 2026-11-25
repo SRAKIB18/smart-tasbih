@@ -1,6 +1,5 @@
 package com.ruhutasbih.app.ui.screens.home
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,7 +74,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToCounter: (String) -> Unit,
     onSaveTasbih: (TasbihEntity) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()

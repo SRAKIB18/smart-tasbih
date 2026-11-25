@@ -39,7 +39,6 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -163,151 +162,155 @@ fun HistoryScreen(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
             ) {
-                if (uiState.selectedTab == 0 || uiState.selectedTab == 1) {
-                    // Daily & Weekly Date Selector
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { viewModel.selectPreviousDay() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                contentDescription = "Previous Day"
-                            )
-                        }
-
-                        OutlinedButton(
-                            onClick = { showDatePickerModal = true },
-                            shape = RoundedCornerShape(20.dp)
+                when (uiState.selectedTab) {
+                    0, 1 -> {
+                        // Daily & Weekly Date Selector
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = "Select Date",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = uiState.selectedDailyDate,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Bold
-                                )
-                            )
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (!uiState.isTodaySelected) {
-                                IconButton(onClick = { viewModel.selectToday() }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Today,
-                                        contentDescription = "Jump to Today",
-                                        tint = ArabicGoldText
-                                    )
-                                }
-                            }
-                            IconButton(onClick = { viewModel.selectNextDay() }) {
+                            IconButton(onClick = { viewModel.selectPreviousDay() }) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                    contentDescription = "Next Day"
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                    contentDescription = "Previous Day"
                                 )
                             }
-                        }
-                    }
-                } else if (uiState.selectedTab == 2) {
-                    // Monthly Custom Month & Year Selector
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Month Dropdown
-                        Box {
-                            OutlinedButton(
-                                onClick = { showMonthDropdown = true },
-                                shape = RoundedCornerShape(20.dp)
-                            ) {
-                                Text(monthNames.getOrElse(uiState.selectedMonthlyMonth - 1) { "Month" })
-                                Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Month")
-                            }
-                            DropdownMenu(
-                                expanded = showMonthDropdown,
-                                onDismissRequest = { showMonthDropdown = false }
-                            ) {
-                                monthNames.forEachIndexed { index, mName ->
-                                    DropdownMenuItem(
-                                        text = { Text(mName) },
-                                        onClick = {
-                                            showMonthDropdown = false
-                                            viewModel.onMonthlyMonthYearSelected(uiState.selectedMonthlyYear, index + 1)
-                                        }
-                                    )
-                                }
-                            }
-                        }
 
-                        // Year Dropdown
-                        Box {
                             OutlinedButton(
-                                onClick = { showYearDropdown = true },
+                                onClick = { showDatePickerModal = true },
                                 shape = RoundedCornerShape(20.dp)
                             ) {
-                                Text("${uiState.selectedMonthlyYear}")
-                                Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Year")
+                                Icon(
+                                    imageVector = Icons.Default.CalendarMonth,
+                                    contentDescription = "Select Date",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = uiState.selectedDailyDate,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
                             }
-                            DropdownMenu(
-                                expanded = showYearDropdown,
-                                onDismissRequest = { showYearDropdown = false }
-                            ) {
-                                uiState.availableYears.forEach { yr ->
-                                    DropdownMenuItem(
-                                        text = { Text("$yr") },
-                                        onClick = {
-                                            showYearDropdown = false
-                                            viewModel.onMonthlyMonthYearSelected(yr, uiState.selectedMonthlyMonth)
-                                        }
+
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (!uiState.isTodaySelected) {
+                                    IconButton(onClick = { viewModel.selectToday() }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Today,
+                                            contentDescription = "Jump to Today",
+                                            tint = ArabicGoldText
+                                        )
+                                    }
+                                }
+                                IconButton(onClick = { viewModel.selectNextDay() }) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                        contentDescription = "Next Day"
                                     )
                                 }
                             }
                         }
                     }
-                } else {
-                    // Yearly Custom Year Selector
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Select Year: ",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box {
-                            OutlinedButton(
-                                onClick = { showYearDropdown = true },
-                                shape = RoundedCornerShape(20.dp)
-                            ) {
-                                Text("${uiState.selectedYearlyYear}")
-                                Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Year")
+                    2 -> {
+                        // Monthly Custom Month & Year Selector
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Month Dropdown
+                            Box {
+                                OutlinedButton(
+                                    onClick = { showMonthDropdown = true },
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Text(monthNames.getOrElse(uiState.selectedMonthlyMonth - 1) { "Month" })
+                                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Month")
+                                }
+                                DropdownMenu(
+                                    expanded = showMonthDropdown,
+                                    onDismissRequest = { showMonthDropdown = false }
+                                ) {
+                                    monthNames.forEachIndexed { index, mName ->
+                                        DropdownMenuItem(
+                                            text = { Text(mName) },
+                                            onClick = {
+                                                showMonthDropdown = false
+                                                viewModel.onMonthlyMonthYearSelected(uiState.selectedMonthlyYear, index + 1)
+                                            }
+                                        )
+                                    }
+                                }
                             }
-                            DropdownMenu(
-                                expanded = showYearDropdown,
-                                onDismissRequest = { showYearDropdown = false }
-                            ) {
-                                uiState.availableYears.forEach { yr ->
-                                    DropdownMenuItem(
-                                        text = { Text("$yr") },
-                                        onClick = {
-                                            showYearDropdown = false
-                                            viewModel.onYearlyYearSelected(yr)
-                                        }
-                                    )
+
+                            // Year Dropdown
+                            Box {
+                                OutlinedButton(
+                                    onClick = { showYearDropdown = true },
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Text("${uiState.selectedMonthlyYear}")
+                                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Year")
+                                }
+                                DropdownMenu(
+                                    expanded = showYearDropdown,
+                                    onDismissRequest = { showYearDropdown = false }
+                                ) {
+                                    uiState.availableYears.forEach { yr ->
+                                        DropdownMenuItem(
+                                            text = { Text("$yr") },
+                                            onClick = {
+                                                showYearDropdown = false
+                                                viewModel.onMonthlyMonthYearSelected(yr, uiState.selectedMonthlyMonth)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+                        // Yearly Custom Year Selector
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Select Year: ",
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Box {
+                                OutlinedButton(
+                                    onClick = { showYearDropdown = true },
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Text("${uiState.selectedYearlyYear}")
+                                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Year")
+                                }
+                                DropdownMenu(
+                                    expanded = showYearDropdown,
+                                    onDismissRequest = { showYearDropdown = false }
+                                ) {
+                                    uiState.availableYears.forEach { yr ->
+                                        DropdownMenuItem(
+                                            text = { Text("$yr") },
+                                            onClick = {
+                                                showYearDropdown = false
+                                                viewModel.onYearlyYearSelected(yr)
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -913,11 +916,10 @@ private fun ProfessionalBarChart(
                         val availableWidth = size.width
                         val count = data.size
                         val barSpacing = availableWidth / (count * 2f + 1f)
-                        val barWidth = barSpacing
 
                         data.forEachIndexed { idx, _ ->
-                            val xStart = barSpacing + idx * (barWidth + barSpacing)
-                            val xEnd = xStart + barWidth
+                            val xStart = barSpacing + idx * (barSpacing + barSpacing)
+                            val xEnd = xStart + barSpacing
                             if (offset.x in (xStart - barSpacing / 2f)..(xEnd + barSpacing / 2f)) {
                                 selectedIndex = if (selectedIndex == idx) null else idx
                             }
@@ -935,7 +937,6 @@ private fun ProfessionalBarChart(
             val usableHeight = size.height - topPadding - bottomPadding
 
             val barSpacing = availableWidth / (count * 2f + 1f)
-            val barWidth = barSpacing
 
             // Draw horizontal grid lines
             val lineCount = 3
@@ -961,7 +962,7 @@ private fun ProfessionalBarChart(
                 val heightRatio = (valNum.toFloat() / maxVal.toFloat()).coerceIn(0f, 1f)
                 val barHeight = usableHeight * heightRatio
 
-                val x = barSpacing + index * (barWidth + barSpacing)
+                val x = barSpacing + index * (barSpacing + barSpacing)
                 val yTop = topPadding + (usableHeight - barHeight)
                 val yBottom = topPadding + usableHeight
 
@@ -972,7 +973,7 @@ private fun ProfessionalBarChart(
                 drawRoundRect(
                     color = trackColor.copy(alpha = 0.6f),
                     topLeft = Offset(x, topPadding),
-                    size = Size(barWidth, usableHeight),
+                    size = Size(barSpacing, usableHeight),
                     cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx())
                 )
 
@@ -995,7 +996,7 @@ private fun ProfessionalBarChart(
                     drawRoundRect(
                         brush = barGradient,
                         topLeft = Offset(x, yTop),
-                        size = Size(barWidth, barHeight),
+                        size = Size(barSpacing, barHeight),
                         cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx())
                     )
 
@@ -1004,7 +1005,7 @@ private fun ProfessionalBarChart(
                         drawRoundRect(
                             color = goldColor,
                             topLeft = Offset(x - 2.dp.toPx(), yTop - 2.dp.toPx()),
-                            size = Size(barWidth + 4.dp.toPx(), barHeight + 4.dp.toPx()),
+                            size = Size(barSpacing + 4.dp.toPx(), barHeight + 4.dp.toPx()),
                             cornerRadius = CornerRadius(14.dp.toPx(), 14.dp.toPx()),
                             style = Stroke(width = 3.dp.toPx())
                         )
@@ -1015,7 +1016,7 @@ private fun ProfessionalBarChart(
                 if (valNum > 0) {
                     drawContext.canvas.nativeCanvas.drawText(
                         valNum.toString(),
-                        x + barWidth / 2f,
+                        x + barSpacing / 2f,
                         yTop - 10.dp.toPx(),
                         if (isPeak || isSelected) goldPaint else textPaint
                     )
@@ -1024,7 +1025,7 @@ private fun ProfessionalBarChart(
                 // Draw Bottom Axis Label
                 drawContext.canvas.nativeCanvas.drawText(
                     shortLabel,
-                    x + barWidth / 2f,
+                    x + barSpacing / 2f,
                     size.height - 6.dp.toPx(),
                     if (isSelected) goldPaint else textPaint
                 )

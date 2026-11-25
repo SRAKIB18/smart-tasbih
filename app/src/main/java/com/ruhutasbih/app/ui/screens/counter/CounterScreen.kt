@@ -139,7 +139,7 @@ fun CounterScreen(
 
     val currentTasbih = tasbih ?: return
 
-    val isTargetReached = currentTasbih.dailyTarget > 0 && currentTasbih.todayReading >= currentTasbih.dailyTarget
+    val isTargetReached = currentTasbih.dailyTarget > 0 && (currentTasbih.todayReading >= currentTasbih.dailyTarget)
 
     val progress = if (currentTasbih.dailyTarget > 0) {
         (currentTasbih.todayReading.toFloat() / currentTasbih.dailyTarget.toFloat()).coerceIn(0f, 1f)

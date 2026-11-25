@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ruhutasbih.app.data.local.entity.TasbihEntity
-import com.ruhutasbih.app.domain.engine.StreakEngine
 import com.ruhutasbih.app.domain.engine.StreakResult
 import com.ruhutasbih.app.domain.repository.TasbihRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +21,7 @@ data class HomeUiState(
     val activeTasbihsCount: Int = 0,
     val overallProgress: Float = 0f,
     val searchQuery: String = "",
-    val filterMode: String = "ALL" // "ALL", "PINNED", "ACTIVE", "ARCHIVED"
+    val filterMode: String = "ALL", // "ALL", "PINNED", "ACTIVE", "ARCHIVED"
 )
 
 class HomeViewModel(
@@ -30,10 +29,7 @@ class HomeViewModel(
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery
-
     private val _filterMode = MutableStateFlow("ALL")
-    val filterMode: StateFlow<String> = _filterMode
 
     val uiState: StateFlow<HomeUiState> = combine(
         repository.getAllTasbihs(),
