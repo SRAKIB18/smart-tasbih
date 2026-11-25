@@ -426,17 +426,24 @@ fun HistoryScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(text = "🔥", fontSize = 22.sp)
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f, fill = false)
+                                ) {
+                                    Text(text = "🔥", fontSize = 20.sp)
+                                    Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = "জিকির স্ট্রাইক ও ব্যাজসমূহ",
+                                        text = "জিকির স্ট্রাইক ও ব্যাজ",
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            fontSize = 18.sp
-                                        )
+                                            fontSize = 16.sp
+                                        ),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
+
+                                Spacer(modifier = Modifier.width(6.dp))
 
                                 Surface(
                                     shape = RoundedCornerShape(12.dp),
@@ -444,7 +451,7 @@ fun HistoryScreen(
                                     border = BorderStroke(1.dp, PendingBadgeOrange.copy(alpha = 0.4f))
                                 ) {
                                     Text(
-                                        text = "🔥 ${streakResult.currentStreak} দিন (সেরা: ${streakResult.bestStreak} দিন)",
+                                        text = "${streakResult.currentStreak} দিন (সেরা: ${streakResult.bestStreak} দিন)",
                                         style = MaterialTheme.typography.labelMedium.copy(
                                             fontWeight = FontWeight.Bold,
                                             color = PendingBadgeOrange,

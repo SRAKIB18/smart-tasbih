@@ -11,6 +11,7 @@ import android.widget.RemoteViews
 import com.ruhutasbih.app.R
 import com.ruhutasbih.app.data.local.AppDatabase
 import com.ruhutasbih.app.data.repository.TasbihRepositoryImpl
+import com.ruhutasbih.app.domain.engine.StreakEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,11 +81,17 @@ class TasbihWidgetProvider : AppWidgetProvider() {
             appContext.sendBroadcast(intent)
         }
 
-        private fun updateSingleWidget(
+        private suspend fun updateSingleWidget(
             context: Context,
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
         ) {
+            val db = AppDatabase.getDatabase(context.applicationContext)
+            val allProgress = db.dailyProgressDao().getAllProgressList()
+            val allTasbihs = db.tasbihDao().getAllTasbihsList()
+            val totalLifetime = allTasbihs.sumOf { it.lifetimeCount }
+            val streakResult = StreakEngine.calculateStreak(allProgress, totalLifetime)
+
             val serviceIntent = Intent(context, TasbihWidgetService::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                 data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
@@ -93,6 +100,7 @@ class TasbihWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.tasbih_widget_layout).apply {
                 setRemoteAdapter(R.id.widget_list_view, serviceIntent)
                 setEmptyView(R.id.widget_list_view, R.id.widget_empty_view)
+                setTextViewText(R.id.widget_streak_text, "🔥 ${streakResult.currentStreak} দিন")
             }
 
             // PendingIntent Template for Item Increment & Click
