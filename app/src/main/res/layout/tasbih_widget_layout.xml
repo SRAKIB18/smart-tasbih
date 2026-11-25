@@ -9,9 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/widget_bg_vector"
-        android:alpha="0.3"
+        android:src="@drawable/widget_islamic_bg"
         android:importantForAccessibility="no" />
+
+    <!-- Dark gradient overlay to make text readable -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
