@@ -111,7 +111,7 @@ fun TasbihCard(
                         )
                     }
                     Text(
-                        text = tasbih.name,
+                        text = "${tasbih.icon} ${tasbih.name}",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp

@@ -23,5 +23,6 @@ data class TasbihEntity(
     val isArchived: Boolean = false,
     val isPinned: Boolean = false,
     val category: String = "General",
-    val notes: String = ""
+    val notes: String = "",
+    val icon: String = "📿"
 )

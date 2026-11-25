@@ -47,13 +47,21 @@ class TasbihWidgetFactory(private val context: Context) : RemoteViewsService.Rem
 
         val views = RemoteViews(context.packageName, R.layout.tasbih_widget_item)
         views.setTextViewText(R.id.widget_item_name, item.name)
+        views.setTextViewText(
+            R.id.widget_item_meaning,
+            item.meaning.ifBlank { "আল্লাহর জিকির করা" }
+        )
         views.setTextViewText(R.id.widget_item_arabic, item.arabicText.ifBlank { item.name })
         views.setTextViewText(R.id.widget_item_count, "${item.todayReading} / ${item.dailyTarget}")
+
+        val iconStr = item.icon.ifBlank { if (item.name.contains("Astaghfir", ignoreCase = true) || item.arabicText.contains("أَسْتَغْفِرُ")) "🤲" else "📿" }
+        views.setTextViewText(R.id.widget_item_icon, iconStr)
 
         val fillInIntent = Intent().apply {
             putExtra(TasbihWidgetProvider.EXTRA_TASBIH_ID, item.id)
         }
         views.setOnClickFillInIntent(R.id.widget_item_btn_increment, fillInIntent)
+        views.setOnClickFillInIntent(R.id.widget_item_root, fillInIntent)
 
         return views
     }

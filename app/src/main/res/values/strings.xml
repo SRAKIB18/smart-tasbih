@@ -89,6 +89,7 @@
     <string name="sound_water">Water Drop</string>
     <string name="sound_bell">Gentle Bell</string>
     <string name="sound_duff">Duff Tap</string>
+    <string name="select_islamic_icon">Select Islamic Icon</string>
 
     <!-- History -->
     <string name="history_title">Activity &amp; History</string>

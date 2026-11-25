@@ -89,6 +89,7 @@
     <string name="sound_water">পানির ফোঁটা</string>
     <string name="sound_bell">সুনাদ বেল</string>
     <string name="sound_duff">ডুফ ট্যাপ</string>
+    <string name="select_islamic_icon">আইকন নির্বাচন করুন (Islamic Vibe)</string>
 
     <!-- History -->
     <string name="history_title">কার্যক্রম ও ইতিহাস</string>

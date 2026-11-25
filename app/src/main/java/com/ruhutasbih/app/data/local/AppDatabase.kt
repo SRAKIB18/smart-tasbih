@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
         DailyProgressEntity::class,
         CountHistoryEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -60,6 +60,17 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
             }
+
+            override fun onOpen(db: SupportSQLiteDatabase) {
+                super.onOpen(db)
+                INSTANCE?.let { database ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        if (database.tasbihDao().getTasbihCount() == 0) {
+                            populateInitialDatabase(database.tasbihDao())
+                        }
+                    }
+                }
+            }
         }
 
         suspend fun populateInitialDatabase(tasbihDao: TasbihDao) {
@@ -69,77 +80,120 @@ abstract class AppDatabase : RoomDatabase() {
                     name = "Subhanallah",
                     arabicText = "سُبْحَانَ اللَّهِ",
                     transliteration = "Subhanallah",
-                    meaning = "Glory be to Allah",
+                    meaning = "আল্লাহ পরম পবিত্র (Glory be to Allah)",
                     dailyTarget = 100L,
                     previousPending = 0L,
                     isPinned = true,
-                    category = "Daily"
+                    category = "দৈনিক জিকির",
+                    icon = "📿"
                 ),
                 TasbihEntity(
                     id = "TASBIH_002",
                     name = "Alhamdulillah",
                     arabicText = "الْحَمْدُ لِلَّهِ",
                     transliteration = "Alhamdulillah",
-                    meaning = "Praise be to Allah",
+                    meaning = "সকল প্রশংসা একমাত্র আল্লাহর (Praise be to Allah)",
                     dailyTarget = 100L,
                     previousPending = 0L,
                     isPinned = true,
-                    category = "Daily"
+                    category = "দৈনিক জিকির",
+                    icon = "📿"
                 ),
                 TasbihEntity(
                     id = "TASBIH_003",
                     name = "Allahu Akbar",
                     arabicText = "اللَّهُ أَكْبَرُ",
                     transliteration = "Allahu Akbar",
-                    meaning = "Allah is the Greatest",
+                    meaning = "আল্লাহ সবচেয়ে মহান (Allah is the Greatest)",
                     dailyTarget = 100L,
                     previousPending = 0L,
                     isPinned = true,
-                    category = "Daily"
+                    category = "দৈনিক জিকির",
+                    icon = "📿"
                 ),
                 TasbihEntity(
                     id = "TASBIH_004",
                     name = "Astaghfirullah",
                     arabicText = "أَسْتَغْفِرُ اللَّهَ",
                     transliteration = "Astaghfirullah",
-                    meaning = "I seek forgiveness from Allah",
+                    meaning = "আমি আল্লাহর কাছে ক্ষমা প্রার্থনা করছি",
                     dailyTarget = 100L,
                     previousPending = 0L,
-                    isPinned = false,
-                    category = "Forgiveness"
+                    isPinned = true,
+                    category = "ইস্তিগফার",
+                    icon = "🤲"
                 ),
                 TasbihEntity(
                     id = "TASBIH_005",
                     name = "La ilaha illallah",
                     arabicText = "لَا إِلٰهَ إِلَّا اللَّهُ",
                     transliteration = "La ilaha illallah",
-                    meaning = "There is no god but Allah",
+                    meaning = "আল্লাহ ছাড়া সত্য কোনো উপাস্য নেই",
                     dailyTarget = 100L,
                     previousPending = 0L,
-                    isPinned = false,
-                    category = "Tawheed"
+                    isPinned = true,
+                    category = "তাওহীদ",
+                    icon = "🕌"
                 ),
                 TasbihEntity(
                     id = "TASBIH_006",
                     name = "Subhanallahi wa bihamdihi",
                     arabicText = "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ سُبْحَانَ اللَّهِ الْعَظِيمِ",
                     transliteration = "Subhanallahi wa bihamdihi, Subhanallahil Azeem",
-                    meaning = "Glory be to Allah and His is the praise, Glory be to Allah the Supreme",
+                    meaning = "আল্লাহর প্রশংসাসহ তাঁর পবিত্রতা ঘোষণা করছি",
                     dailyTarget = 100L,
                     previousPending = 0L,
                     isPinned = false,
-                    category = "Praise"
+                    category = "জিকির ও প্রশংসা",
+                    icon = "✨"
                 ),
                 TasbihEntity(
                     id = "TASBIH_007",
                     name = "Durood Sharif",
                     arabicText = "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ",
                     transliteration = "Allahumma salli ala Muhammadin wa ala ali Muhammad",
-                    meaning = "O Allah, send blessings upon Muhammad and the family of Muhammad",
+                    meaning = "হে আল্লাহ, মুহাম্মদ (সাঃ) ও তাঁর পরিবারের ওপর রহমত বর্ষণ করুন",
                     dailyTarget = 100L,
                     previousPending = 0L,
                     isPinned = false,
-                    category = "Salawat"
+                    category = "দরূদ",
+                    icon = "🌸"
+                ),
+                TasbihEntity(
+                    id = "TASBIH_008",
+                    name = "La hawla wa la quwwata illa billah",
+                    arabicText = "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+                    transliteration = "La hawla wa la quwwata illa billah",
+                    meaning = "আল্লাহর সাহায্য ছাড়া কোনো উপায় বা শক্তি নেই",
+                    dailyTarget = 100L,
+                    previousPending = 0L,
+                    isPinned = false,
+                    category = "জান্নাতের রত্ন",
+                    icon = "👑"
+                ),
+                TasbihEntity(
+                    id = "TASBIH_009",
+                    name = "Ayatul Kursi",
+                    arabicText = "اللَّهُ لَا إِلٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+                    transliteration = "Allahula ilaha illa huwal hayyul qayyum",
+                    meaning = "আল্লাহ, যিনি ছাড়া কোনো উপাস্য নেই, তিনি চিরঞ্জীব",
+                    dailyTarget = 33L,
+                    previousPending = 0L,
+                    isPinned = false,
+                    category = "কুরআনের আয়াত",
+                    icon = "📖"
+                ),
+                TasbihEntity(
+                    id = "TASBIH_010",
+                    name = "Hasbunallahu wa ni'mal wakeel",
+                    arabicText = "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+                    transliteration = "Hasbunallahu wa ni'mal wakeel",
+                    meaning = "আমাদের জন্য আল্লাহই যথেষ্ট, এবং তিনি উত্তম অভিভাবক",
+                    dailyTarget = 100L,
+                    previousPending = 0L,
+                    isPinned = false,
+                    category = "ভরসা ও নিরাপত্তা",
+                    icon = "🌿"
                 )
             )
             tasbihDao.insertAll(defaultTasbihs)

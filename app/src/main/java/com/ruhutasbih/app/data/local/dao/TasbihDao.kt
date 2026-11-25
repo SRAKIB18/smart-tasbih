@@ -30,6 +30,9 @@ interface TasbihDao {
     @Query("SELECT * FROM tasbih_table")
     suspend fun getAllTasbihsList(): List<TasbihEntity>
 
+    @Query("SELECT COUNT(*) FROM tasbih_table")
+    suspend fun getTasbihCount(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTasbih(tasbih: TasbihEntity)
 

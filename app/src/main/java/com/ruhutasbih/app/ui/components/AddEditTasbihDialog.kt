@@ -1,15 +1,25 @@
 package com.ruhutasbih.app.ui.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -17,11 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ruhutasbih.app.R
 import com.ruhutasbih.app.data.local.entity.TasbihEntity
 
@@ -35,12 +47,15 @@ fun AddEditTasbihDialog(
     var arabicText by remember { mutableStateOf(initialTasbih?.arabicText ?: "") }
     var transliteration by remember { mutableStateOf(initialTasbih?.transliteration ?: "") }
     var meaning by remember { mutableStateOf(initialTasbih?.meaning ?: "") }
+    var selectedIcon by remember { mutableStateOf(initialTasbih?.icon ?: "📿") }
     var dailyTargetStr by remember { mutableStateOf((initialTasbih?.dailyTarget ?: 100L).toString()) }
     var previousPendingStr by remember { mutableStateOf((initialTasbih?.previousPending ?: 0L).toString()) }
     var category by remember { mutableStateOf(initialTasbih?.category ?: "Daily") }
     var notes by remember { mutableStateOf(initialTasbih?.notes ?: "") }
 
     var isError by remember { mutableStateOf(false) }
+
+    val islamicIcons = listOf("📿", "🤲", "🕌", "🌙", "📖", "🕋", "✨", "🌿", "💚", "🌸", "👑", "⚡")
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -56,6 +71,41 @@ fun AddEditTasbihDialog(
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
+                // Islamic Icon Library Selector
+                Text(
+                    text = stringResource(R.string.select_islamic_icon),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(islamicIcons) { icon ->
+                        val isSelected = selectedIcon == icon
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                            border = BorderStroke(
+                                width = if (isSelected) 2.dp else 1.dp,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                            ),
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clickable { selectedIcon = icon }
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(text = icon, fontSize = 20.sp)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 OutlinedTextField(
                     value = name,
                     onValueChange = {
@@ -167,7 +217,8 @@ fun AddEditTasbihDialog(
                         isArchived = initialTasbih?.isArchived ?: false,
                         isPinned = initialTasbih?.isPinned ?: false,
                         category = category.ifBlank { "General" },
-                        notes = notes.trim()
+                        notes = notes.trim(),
+                        icon = selectedIcon
                     )
 
                     onConfirm(updated)

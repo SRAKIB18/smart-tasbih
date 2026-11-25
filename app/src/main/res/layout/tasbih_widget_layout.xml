@@ -2,41 +2,52 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0B0F19"
+    android:background="@drawable/widget_card_background"
     android:orientation="vertical"
     android:padding="10dp">
 
-    <!-- Widget Header Row Container -->
+    <!-- Header Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/widget_header_background"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="8dp">
+        android:paddingHorizontal="4dp"
+        android:paddingBottom="8dp">
 
         <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:contentDescription="App Icon"
             android:src="@mipmap/ic_launcher" />
 
-        <TextView
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="📿 আর-রূহ তাসবিহ"
-            android:textColor="#F59E0B"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="আর-রূহ তাসবিহ"
+                android:textColor="#F59E0B"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="আল্লাহর স্মরণে থাকুন..."
+                android:textColor="#A7F3D0"
+                android:textSize="10sp" />
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/widget_btn_refresh"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Refresh"
             android:src="@android:drawable/ic_popup_sync" />
@@ -59,7 +70,17 @@
         android:gravity="center"
         android:text="কোনো পিন করা তাসবিহ পাওয়া যায়নি"
         android:textColor="#94A3B8"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:visibility="gone" />
+
+    <!-- Footer Quote Banner -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:text="— 🌿 স্মরণে শান্তি, ইবাদতে বরকত 🌿 —"
+        android:textColor="#F59E0B"
+        android:textSize="11sp" />
 
 </LinearLayout>
