@@ -6,14 +6,16 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <!-- Widget Header Row -->
+    <!-- Widget Header Row Container -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/widget_header_background"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="4dp"
-        android:paddingBottom="8dp">
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp">
 
         <ImageView
             android:layout_width="22dp"
@@ -27,14 +29,14 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:text="📿 আর-রূহ তাসবিহ"
-            android:textColor="#F8FAFC"
+            android:textColor="#F59E0B"
             android:textSize="14sp"
             android:textStyle="bold" />
 
         <ImageButton
             android:id="@+id/widget_btn_refresh"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Refresh"
             android:src="@android:drawable/ic_popup_sync" />

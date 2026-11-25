@@ -16,7 +16,7 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <!-- Top Row: Name & Progress Count -->
+        <!-- Top Row: Name & Progress Pill -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,13 +35,17 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
+            <!-- Progress Count Pill Badge -->
             <TextView
                 android:id="@+id/widget_item_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="27 / 100"
+                android:background="@drawable/widget_pill_background"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp"
+                android:text="33 / 100"
                 android:textColor="#38BDF8"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -50,10 +54,10 @@
             android:id="@+id/widget_item_arabic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="4dp"
             android:text="الْحَمْدُ لِلَّهِ"
             android:textColor="#F59E0B"
-            android:textSize="16sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
     </LinearLayout>
 
