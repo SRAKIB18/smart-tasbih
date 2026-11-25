@@ -21,6 +21,9 @@ class SoundManager(context: Context) {
                 "WOOD_CLICK" -> ToneGenerator.TONE_PROP_ACK
                 "METALLIC_TINK" -> ToneGenerator.TONE_PROP_PROMPT
                 "SOFT_TICK" -> ToneGenerator.TONE_DTMF_1
+                "WATER_DROP" -> ToneGenerator.TONE_CDMA_HIGH_PBX_L
+                "BELL_CHIME" -> ToneGenerator.TONE_PROP_BEEP2
+                "DUFF_TAP" -> ToneGenerator.TONE_CDMA_LOW_PBX_L
                 else -> ToneGenerator.TONE_PROP_BEEP // "BEEP"
             }
             toneGenerator?.startTone(tone, 30)

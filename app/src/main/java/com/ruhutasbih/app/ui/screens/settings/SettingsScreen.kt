@@ -251,12 +251,15 @@ fun SettingsScreen(
                                 )
                             )
                             Spacer(modifier = Modifier.height(6.dp))
-                            val soundTypes = listOf("BEEP", "WOOD_CLICK", "METALLIC_TINK", "SOFT_TICK")
+                            val soundTypes = listOf("BEEP", "WOOD_CLICK", "METALLIC_TINK", "SOFT_TICK", "WATER_DROP", "BELL_CHIME", "DUFF_TAP")
                             val soundLabels = listOf(
                                 stringResource(R.string.sound_beep),
                                 stringResource(R.string.sound_wood),
                                 stringResource(R.string.sound_metallic),
-                                stringResource(R.string.sound_soft)
+                                stringResource(R.string.sound_soft),
+                                stringResource(R.string.sound_water),
+                                stringResource(R.string.sound_bell),
+                                stringResource(R.string.sound_duff)
                             )
                             LazyRow(
                                 modifier = Modifier.fillMaxWidth(),
