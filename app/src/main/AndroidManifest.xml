@@ -26,6 +26,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".ui.util.TasbihWidgetProvider"
+            android:exported="true"
+            android:label="Ruhu Tasbih Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.ruhutasbih.app.WIDGET_INCREMENT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tasbih_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".ui.util.TasbihWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

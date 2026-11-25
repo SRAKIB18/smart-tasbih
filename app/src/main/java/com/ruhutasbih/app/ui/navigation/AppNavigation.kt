@@ -57,7 +57,8 @@ fun AppNavigation(
         TasbihRepositoryImpl(
             tasbihDao = database.tasbihDao(),
             dailyProgressDao = database.dailyProgressDao(),
-            countHistoryDao = database.countHistoryDao()
+            countHistoryDao = database.countHistoryDao(),
+            context = context.applicationContext
         )
     }
     val historyRepository = remember {

@@ -1,5 +1,6 @@
 package com.ruhutasbih.app.data.repository
 
+import android.content.Context
 import com.ruhutasbih.app.data.local.dao.CountHistoryDao
 import com.ruhutasbih.app.data.local.dao.DailyProgressDao
 import com.ruhutasbih.app.data.local.dao.TasbihDao
@@ -9,12 +10,14 @@ import com.ruhutasbih.app.data.local.entity.TasbihEntity
 import com.ruhutasbih.app.domain.engine.DateRolloverEngine
 import com.ruhutasbih.app.domain.engine.SmartCountingEngine
 import com.ruhutasbih.app.domain.repository.TasbihRepository
+import com.ruhutasbih.app.ui.util.TasbihWidgetProvider
 import kotlinx.coroutines.flow.Flow
 
 class TasbihRepositoryImpl(
     private val tasbihDao: TasbihDao,
     private val dailyProgressDao: DailyProgressDao,
-    private val countHistoryDao: CountHistoryDao
+    private val countHistoryDao: CountHistoryDao,
+    private val context: Context? = null
 ) : TasbihRepository {
 
     override fun getAllTasbihs(): Flow<List<TasbihEntity>> = tasbihDao.getAllTasbihs()
@@ -208,5 +211,6 @@ class TasbihRepositoryImpl(
             isCompleted = tasbih.todayReading >= tasbih.dailyTarget
         )
         dailyProgressDao.insertOrUpdateProgress(progressEntity)
+        context?.let { TasbihWidgetProvider.updateAllWidgets(it) }
     }
 }
