@@ -40,12 +40,15 @@ import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -75,6 +78,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ruhutasbih.app.R
@@ -130,6 +134,7 @@ fun CounterScreen(
 
     var showResetDialog by remember { mutableStateOf(false) }
     var showSkinDialog by remember { mutableStateOf(false) }
+    var actionsMenuExpanded by remember { mutableStateOf(false) }
 
     val currentTasbih = tasbih ?: return
 
@@ -156,7 +161,12 @@ fun CounterScreen(
                     title = {
                         Text(
                             text = currentTasbih.name,
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     },
                     navigationIcon = {
@@ -168,33 +178,6 @@ fun CounterScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { viewModel.toggleSound() }) {
-                            Icon(
-                                imageVector = if (soundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
-                                contentDescription = "Toggle Sound"
-                            )
-                        }
-                        IconButton(onClick = { viewModel.toggleVibration() }) {
-                            Icon(
-                                imageVector = Icons.Default.Vibration,
-                                contentDescription = "Toggle Vibration",
-                                tint = if (vibrationEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        IconButton(onClick = { viewModel.toggleKeepScreenAwake() }) {
-                            Icon(
-                                imageVector = Icons.Default.LightMode,
-                                contentDescription = "Keep Screen Awake",
-                                tint = if (keepScreenAwake) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        IconButton(onClick = { showSkinDialog = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Palette,
-                                contentDescription = "Select Skin",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
                         IconButton(onClick = {
                             viewModel.toggleLock()
                             val msg = if (!isLocked) "কাউন্টার লক করা হয়েছে" else "কাউন্টার আনলক করা হয়েছে"
@@ -206,11 +189,81 @@ fun CounterScreen(
                                 tint = if (isLocked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        IconButton(onClick = { viewModel.toggleFullScreen() }) {
+
+                        IconButton(onClick = { showSkinDialog = true }) {
                             Icon(
-                                imageVector = if (isFullScreen) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
-                                contentDescription = "Full Screen"
+                                imageVector = Icons.Default.Palette,
+                                contentDescription = "Select Skin",
+                                tint = MaterialTheme.colorScheme.primary
                             )
+                        }
+
+                        Box {
+                            IconButton(onClick = { actionsMenuExpanded = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "More Options"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = actionsMenuExpanded,
+                                onDismissRequest = { actionsMenuExpanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(if (soundEnabled) "শব্দ বন্ধ করুন (Sound OFF)" else "শব্দ চালু করুন (Sound ON)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = if (soundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        actionsMenuExpanded = false
+                                        viewModel.toggleSound()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(if (vibrationEnabled) "ভাইব্রেশন বন্ধ করুন" else "ভাইব্রেশন চালু করুন") },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Vibration,
+                                            contentDescription = null,
+                                            tint = if (vibrationEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    onClick = {
+                                        actionsMenuExpanded = false
+                                        viewModel.toggleVibration()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(if (keepScreenAwake) "স্ক্রিন অন বন্ধ করুন" else "স্ক্রিন অন চালু করুন") },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.LightMode,
+                                            contentDescription = null,
+                                            tint = if (keepScreenAwake) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    onClick = {
+                                        actionsMenuExpanded = false
+                                        viewModel.toggleKeepScreenAwake()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(if (isFullScreen) "ফুলস্ক্রিন থেকে বের হন" else "ফুলস্ক্রিন মোড") },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = if (isFullScreen) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        actionsMenuExpanded = false
+                                        viewModel.toggleFullScreen()
+                                    }
+                                )
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

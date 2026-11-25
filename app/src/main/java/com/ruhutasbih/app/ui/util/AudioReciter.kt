@@ -1,6 +1,7 @@
 package com.ruhutasbih.app.ui.util
 
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
@@ -25,13 +26,7 @@ class AudioReciter(context: Context) : TextToSpeech.OnInitListener {
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            val arabicLocale = Locale("ar", "SA")
-            val result = tts?.setLanguage(arabicLocale)
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                tts?.language = Locale("ar")
-            }
-            tts?.setSpeechRate(0.85f)
-            tts?.setPitch(1.0f)
+            applyMaleArabicVoice()
 
             tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {}
@@ -54,19 +49,55 @@ class AudioReciter(context: Context) : TextToSpeech.OnInitListener {
         }
     }
 
+    private fun applyMaleArabicVoice() {
+        try {
+            val arabicLocale = Locale("ar", "SA")
+            val result = tts?.setLanguage(arabicLocale)
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                tts?.language = Locale("ar")
+            }
+
+            // Prefer Male Voice in system TTS engine
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val voices = tts?.voices
+                if (!voices.isNullOrEmpty()) {
+                    val maleVoice = voices.firstOrNull { voice ->
+                        voice.locale.language == "ar" && (
+                            voice.name.lowercase().contains("male") ||
+                            voice.name.lowercase().contains("ar-x-m") ||
+                            voice.name.lowercase().contains("ar-ww-x-mma") ||
+                            voice.name.lowercase().contains("ar-xa-x-ard")
+                        )
+                    } ?: voices.firstOrNull { voice ->
+                        voice.locale.language == "ar" && !voice.name.lowercase().contains("female")
+                    }
+                    if (maleVoice != null) {
+                        tts?.voice = maleVoice
+                    }
+                }
+            }
+
+            // Lower pitch (0.80f) guarantees a deep, clear male Qari recitation tone
+            tts?.setPitch(0.80f)
+            tts?.setSpeechRate(0.85f)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     fun speak(text: String, onStart: () -> Unit = {}, onDone: () -> Unit = {}) {
         if (text.isBlank()) return
         onDoneCallback = onDone
 
         try {
             if (isInitialized && tts != null) {
+                applyMaleArabicVoice()
                 onStart()
                 tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "DHIKR_UTTERANCE_${System.currentTimeMillis()}")
             } else {
                 tts = TextToSpeech(appContext) { status ->
                     if (status == TextToSpeech.SUCCESS) {
-                        tts?.language = Locale("ar")
-                        tts?.setSpeechRate(0.85f)
+                        applyMaleArabicVoice()
                         onStart()
                         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "DHIKR_UTTERANCE")
                     } else {
