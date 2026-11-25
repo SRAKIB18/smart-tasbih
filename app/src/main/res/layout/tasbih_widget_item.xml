@@ -3,19 +3,20 @@
     android:id="@+id/widget_item_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="6dp"
+    android:layout_marginBottom="8dp"
     android:background="@drawable/widget_card_background"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="12dp">
 
-    <!-- Left Column: Name, Arabic & Count -->
+    <!-- Left Column: Name, Arabic Text & Progress -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical">
 
+        <!-- Top Row: Name & Progress Count -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,43 +30,44 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Allahu Akbar"
-                android:textColor="#38BDF8"
-                android:textSize="13sp"
+                android:text="Alhamdulillah"
+                android:textColor="#F8FAFC"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widget_item_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="7 / 100"
-                android:textColor="#F8FAFC"
+                android:text="27 / 100"
+                android:textColor="#38BDF8"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Middle Row: Arabic Calligraphy -->
         <TextView
             android:id="@+id/widget_item_arabic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="اللَّهُ أَكْبَرُ"
+            android:layout_marginTop="3dp"
+            android:text="الْحَمْدُ لِلَّهِ"
             android:textColor="#F59E0B"
-            android:textSize="15sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Right Side: +1 Quick Increment Button -->
+    <!-- Right Side: Big +1 Quick Count Button -->
     <Button
         android:id="@+id/widget_item_btn_increment"
         android:layout_width="wrap_content"
-        android:layout_height="34dp"
-        android:layout_marginStart="8dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="10dp"
         android:backgroundTint="#0284C7"
-        android:paddingHorizontal="14dp"
+        android:paddingHorizontal="16dp"
         android:text="+1"
         android:textColor="#FFFFFF"
-        android:textSize="13sp"
+        android:textSize="14sp"
         android:textStyle="bold" />
 
 </LinearLayout>

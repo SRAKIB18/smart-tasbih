@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#0B0F19"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="10dp">
 
     <!-- Widget Header Row -->
     <LinearLayout
@@ -13,28 +13,28 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="4dp"
-        android:paddingBottom="6dp">
+        android:paddingBottom="8dp">
 
         <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:contentDescription="App Icon"
             android:src="@mipmap/ic_launcher" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="📿 পিন করা তাসবিহসমূহ"
+            android:text="📿 আর-রূহ তাসবিহ"
             android:textColor="#F8FAFC"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <ImageButton
             android:id="@+id/widget_btn_refresh"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Refresh"
             android:src="@android:drawable/ic_popup_sync" />
@@ -57,7 +57,7 @@
         android:gravity="center"
         android:text="কোনো পিন করা তাসবিহ পাওয়া যায়নি"
         android:textColor="#94A3B8"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:visibility="gone" />
 
 </LinearLayout>
