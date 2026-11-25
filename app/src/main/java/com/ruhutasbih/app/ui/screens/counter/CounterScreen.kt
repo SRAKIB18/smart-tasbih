@@ -233,6 +233,19 @@ fun CounterScreen(
             auraGlowColor = Color(0xFF34D399).copy(alpha = 0.25f),
             drawBeads = true
         )
+        "MINIMALIST_ZEN" -> SkinConfig(
+            key = "MINIMALIST_ZEN",
+            name = stringResource(R.string.skin_minimalist_zen),
+            iconStr = "🍃",
+            trackColor = Color(0xFF1E293B),
+            arcStartColor = Color(0xFF38BDF8),
+            arcEndColor = Color(0xFF34D399),
+            innerSurfaceColor = Color(0xFF0F172A),
+            numberTextColor = Color(0xFFF8FAFC),
+            subtitleColor = Color(0xFF38BDF8),
+            auraGlowColor = Color.Transparent,
+            drawBeads = false
+        )
         else -> SkinConfig( // DIGITAL_LED
             key = "DIGITAL_LED",
             name = stringResource(R.string.skin_digital_led),
@@ -841,7 +854,8 @@ fun CounterScreen(
                         SkinConfig("METALLIC_RING", stringResource(R.string.skin_metallic_ring), "⚙️", Color(0xFF1A232A), Color(0xFFFFD700), Color(0xFFFFA000), Color(0xFF102A43), Color(0xFFFFE082), Color(0xFFFFD700), Color.Unspecified, true),
                         SkinConfig("ISLAMIC_GOLD", stringResource(R.string.skin_islamic_gold), "🕌", Color(0xFF0F172A), Color(0xFFFFD700), Color(0xFFFFB300), Color(0xFF1E1B4B), Color(0xFFFFF176), Color(0xFFFFD700), Color.Unspecified, true),
                         SkinConfig("COSMIC_GALAXY", stringResource(R.string.skin_cosmic_galaxy), "🌌", Color(0xFF180E29), Color(0xFFA855F7), Color(0xFF38BDF8), Color(0xFF0B071A), Color(0xFFE9D5FF), Color(0xFFC084FC), Color.Unspecified, true),
-                        SkinConfig("NATURAL_JADE", stringResource(R.string.skin_natural_jade), "🌿", Color(0xFF064E3B), Color(0xFF10B981), Color(0xFF34D399), Color(0xFF022C22), Color(0xFFA7F3D0), Color(0xFF34D399), Color.Unspecified, true)
+                        SkinConfig("NATURAL_JADE", stringResource(R.string.skin_natural_jade), "🌿", Color(0xFF064E3B), Color(0xFF10B981), Color(0xFF34D399), Color(0xFF022C22), Color(0xFFA7F3D0), Color(0xFF34D399), Color.Unspecified, true),
+                        SkinConfig("MINIMALIST_ZEN", stringResource(R.string.skin_minimalist_zen), "🍃", Color(0xFF1E293B), Color(0xFF34D399), Color(0xFF34D399), Color(0xFF0F172A), Color(0xFFF8FAFC), Color(0xFF94A3B8), Color.Unspecified, false)
                     )
 
                     skins.forEach { item ->
